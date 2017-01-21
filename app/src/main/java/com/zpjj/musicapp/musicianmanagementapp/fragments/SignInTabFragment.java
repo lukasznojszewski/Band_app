@@ -26,11 +26,12 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.zpjj.musicapp.musicianmanagementapp.R;
-import com.zpjj.musicapp.musicianmanagementapp.activities.BaseActivity;
+import com.zpjj.musicapp.musicianmanagementapp.activities.CreateBandActivity;
+import com.zpjj.musicapp.musicianmanagementapp.activities.auth.BaseActivity;
 import com.zpjj.musicapp.musicianmanagementapp.activities.MainActivity;
 import com.zpjj.musicapp.musicianmanagementapp.activities.auth.AuthActivity;
-
-import java.util.concurrent.Executor;
+import com.zpjj.musicapp.musicianmanagementapp.exceptions.UserNotFoundException;
+import com.zpjj.musicapp.musicianmanagementapp.services.UserService;
 
 public class SignInTabFragment extends Fragment implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "AUTH";
@@ -97,11 +98,27 @@ public class SignInTabFragment extends Fragment implements View.OnClickListener,
                             Toast.makeText(context, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            Intent i = new Intent(context, MainActivity.class);
-                            startActivity(i);
+                            UserService userService = new UserService();
+                            try {
+                                userService.userHasBand(context.mAuth.getCurrentUser()).subscribe(
+                                            hasBand -> {
+                                                if(hasBand) {
+                                                    Intent i = new Intent(context, MainActivity.class);
+                                                    startActivity(i);
+                                                } else {
+                                                    Intent i = new Intent(context, CreateBandActivity.class);
+                                                    startActivity(i);
+                                                }
+                                            }
+                                    );
+                            } catch (UserNotFoundException e) {
+                                e.printStackTrace();
+                            }
+
                         }
                     }
                 });
+
     }
 
 
@@ -171,12 +188,13 @@ public class SignInTabFragment extends Fragment implements View.OnClickListener,
         Log.d(TAG, "firebaseAuthWithGoogle:" + account.getId());
         AuthActivity context = (AuthActivity) getActivity();
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+        context.showProgressDialog();
         ((BaseActivity)getActivity()).mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(context, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
-
+                        context.hideProgressDialog();
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithCredential", task.getException());
                             Toast.makeText(context, "Authentication failed.",

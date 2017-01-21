@@ -1,6 +1,5 @@
 package com.zpjj.musicapp.musicianmanagementapp.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -19,8 +18,9 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.zpjj.musicapp.musicianmanagementapp.R;
-import com.zpjj.musicapp.musicianmanagementapp.activities.MainActivity;
 import com.zpjj.musicapp.musicianmanagementapp.activities.auth.AuthActivity;
+import com.zpjj.musicapp.musicianmanagementapp.models.UserInfo;
+import com.zpjj.musicapp.musicianmanagementapp.services.UserService;
 
 
 public class SignUpTabFragment extends Fragment {
@@ -64,8 +64,6 @@ public class SignUpTabFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
-
-                context.hideProgressDialog();
                 if (!task.isSuccessful()) {
                    if(task.getException() instanceof FirebaseAuthUserCollisionException) {
                        Toast.makeText(context, "Użytkownik już istnieje",
@@ -77,8 +75,11 @@ public class SignUpTabFragment extends Fragment {
                     Log.w(TAG, "signInWithCredential", task.getException());
 
                 } else {
+                    UserService userService = new UserService();
+                    userService.addUserInfo(context.mAuth.getCurrentUser(), new UserInfo());
                     context.mViewPager.setCurrentItem(0);
                 }
+                context.hideProgressDialog();
             }
         });
     }

@@ -59,6 +59,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "884884777672-37p3jn968236kv77eplmrifpecmpfhrl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zpjj.musicapp.musicianmanagementapp",
+            "certificate_hash": "282A992A61BD9171A55621AABE30B47E53DA33D1"
+          }
+        },
+        {
           "client_id": "884884777672-h3rqt6mlsavfsqdrjn4vhk492asg9blt.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

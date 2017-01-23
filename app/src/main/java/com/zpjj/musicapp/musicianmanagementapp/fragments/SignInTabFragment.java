@@ -26,11 +26,11 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.zpjj.musicapp.musicianmanagementapp.R;
-import com.zpjj.musicapp.musicianmanagementapp.activities.CreateBandActivity;
 import com.zpjj.musicapp.musicianmanagementapp.activities.auth.BaseActivity;
 import com.zpjj.musicapp.musicianmanagementapp.activities.MainActivity;
 import com.zpjj.musicapp.musicianmanagementapp.activities.auth.AuthActivity;
 import com.zpjj.musicapp.musicianmanagementapp.exceptions.UserNotFoundException;
+import com.zpjj.musicapp.musicianmanagementapp.models.UserInfo;
 import com.zpjj.musicapp.musicianmanagementapp.services.UserService;
 
 public class SignInTabFragment extends Fragment implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
@@ -98,22 +98,24 @@ public class SignInTabFragment extends Fragment implements View.OnClickListener,
                             Toast.makeText(context, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
+                            Log.d(TAG, task.getResult().getUser().getUid());
                             UserService userService = new UserService();
-                            try {
-                                userService.userHasBand(context.mAuth.getCurrentUser()).subscribe(
-                                            hasBand -> {
-                                                if(hasBand) {
-                                                    Intent i = new Intent(context, MainActivity.class);
-                                                    startActivity(i);
-                                                } else {
-                                                    Intent i = new Intent(context, CreateBandActivity.class);
-                                                    startActivity(i);
-                                                }
-                                            }
-                                    );
-                            } catch (UserNotFoundException e) {
-                                e.printStackTrace();
-                            }
+                            userService.getUserInfo(task.getResult().getUser()).subscribe(
+                                    data -> {
+                                        Intent i = new Intent(context, MainActivity.class);
+                                        i.putExtra("USER_INFO", data);
+                                        context.startActivity(i);
+                                    }, err -> {
+                                        if(err instanceof UserNotFoundException) {
+                                            UserInfo info = new UserInfo();
+                                            info.setEmail(task.getResult().getUser().getEmail());
+                                            userService.createOrUpdateUserInfo(task.getResult().getUser(), info);
+                                            Intent i = new Intent(context, MainActivity.class);
+                                            i.putExtra("USER_INFO", info);
+                                            context.startActivity(i);
+                                        }
+                                    }
+                            );
 
                         }
                     }
@@ -200,8 +202,24 @@ public class SignInTabFragment extends Fragment implements View.OnClickListener,
                             Toast.makeText(context, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            Intent i = new Intent(context, MainActivity.class);
-                            startActivity(i);
+                            UserService userService = new UserService();
+                            userService.getUserInfo(task.getResult().getUser()).subscribe(
+                                        data -> {
+                                            Intent i = new Intent(context, MainActivity.class);
+                                            i.putExtra("USER_INFO", data);
+                                            context.startActivity(i);
+                                        }, err -> {
+                                            if(err instanceof UserNotFoundException) {
+                                                UserInfo info = new UserInfo();
+                                                info.setEmail(task.getResult().getUser().getEmail());
+                                                userService.createOrUpdateUserInfo(task.getResult().getUser(), info);
+                                                Intent i = new Intent(context, MainActivity.class);
+                                                i.putExtra("USER_INFO", info);
+                                                context.startActivity(i);
+                                            }
+                                        }
+                                );
+
                         }
                     }
                 });
@@ -211,4 +229,7 @@ public class SignInTabFragment extends Fragment implements View.OnClickListener,
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+
+
+
 }

@@ -13,10 +13,6 @@
             android:label="@string/title_activity_auth"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activities.CreateBandActivity"
-            android:label="@string/title_activity_create_band"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".activities.MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar">

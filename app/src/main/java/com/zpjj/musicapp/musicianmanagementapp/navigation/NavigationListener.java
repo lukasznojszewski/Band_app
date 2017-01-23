@@ -13,6 +13,8 @@ import android.view.MenuItem;
 import com.zpjj.musicapp.musicianmanagementapp.R;
 import com.zpjj.musicapp.musicianmanagementapp.activities.auth.AuthActivity;
 import com.zpjj.musicapp.musicianmanagementapp.activities.BaseAuthActivity;
+import com.zpjj.musicapp.musicianmanagementapp.fragments.AddBandFragment;
+import com.zpjj.musicapp.musicianmanagementapp.fragments.ChooseBand;
 import com.zpjj.musicapp.musicianmanagementapp.fragments.CurrentSongFragment;
 
 /**
@@ -34,6 +36,14 @@ public class NavigationListener implements NavigationView.OnNavigationItemSelect
         switch (item.getItemId()) {
             case R.id.nav_current_song:
                 changeFragment(authActivity, CurrentSongFragment.class, R.id.content_main);
+                authActivity.setTitle(item.getTitle());
+                break;
+            case R.id.nav_choose_band:
+                changeFragment(authActivity, ChooseBand.class, R.id.content_main);
+                authActivity.setTitle(item.getTitle());
+                break;
+            case R.id.nav_create_band:
+                changeFragment(authActivity, AddBandFragment.class, R.id.content_main);
                 authActivity.setTitle(item.getTitle());
                 break;
             case R.id.nav_logout:

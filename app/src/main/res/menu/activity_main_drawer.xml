@@ -7,6 +7,14 @@
             android:icon="@mipmap/ic_current_song"
             android:title="@string/currentSong" />
         <item
+            android:id="@+id/nav_choose_band"
+            android:icon="@mipmap/ic_current_song"
+            android:title="@string/choose_band" />
+        <item
+            android:id="@+id/nav_create_band"
+            android:icon="@mipmap/ic_current_song"
+            android:title="@string/title_activity_create_band" />
+        <item
             android:id="@+id/nav_logout"
             android:icon="@mipmap/ic_current_song"
             android:title="@string/logout" />

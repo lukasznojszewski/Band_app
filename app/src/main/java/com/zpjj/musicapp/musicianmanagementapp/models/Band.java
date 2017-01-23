@@ -1,26 +1,36 @@
 package com.zpjj.musicapp.musicianmanagementapp.models;
 
-import com.google.firebase.auth.FirebaseUser;
+import com.zpjj.musicapp.musicianmanagementapp.utils.Utils;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Created by daniel on 15.01.17.
+ * Created by daniel on 22.01.17.
  */
 
 public class Band {
     private String id;
     private String name;
     private String masterUID;
-    private List<String> membersUID;
+    private Map<String, Boolean> users = new HashMap<>();
 
     public Band() {
-        this.id = UUID.randomUUID().toString();
+    }
+
+    public Band(String name, String masterUID) {
+        this.id = Utils.getUUID();
+        this.name = name;
+        this.masterUID = masterUID;
+        this.users.put(masterUID, true);
     }
 
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -31,19 +41,24 @@ public class Band {
         this.name = name;
     }
 
-    public List<String> getMembersUID() {
-        return membersUID;
-    }
-
-    public void setMembersUID(List<String> membersUID) {
-        this.membersUID = membersUID;
-    }
-
     public String getMasterUID() {
         return masterUID;
     }
 
     public void setMasterUID(String masterUID) {
         this.masterUID = masterUID;
+    }
+
+    public Map<String, Boolean> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Map<String, Boolean> users) {
+        this.users = users;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

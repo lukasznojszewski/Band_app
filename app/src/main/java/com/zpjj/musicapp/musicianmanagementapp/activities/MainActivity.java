@@ -6,8 +6,10 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 
 import com.zpjj.musicapp.musicianmanagementapp.R;
+import com.zpjj.musicapp.musicianmanagementapp.models.UserInfo;
 import com.zpjj.musicapp.musicianmanagementapp.navigation.NavigationListener;
 
 public class MainActivity extends BaseAuthActivity {
@@ -34,8 +36,24 @@ public class MainActivity extends BaseAuthActivity {
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         NavigationListener navigationListener = new NavigationListener(this);
         navigationView.setNavigationItemSelectedListener(navigationListener);
-        navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(0));
-        navigationView.setCheckedItem(R.id.nav_current_song);
+        UserInfo info = (UserInfo) getIntent().getSerializableExtra("USER_INFO");
+        if(info == null) {
+            logout();
+        } else {
+            setUserInfo(info);
+            if(info.getBands().size() == 0) {
+                navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(2));
+                navigationView.setCheckedItem(R.id.nav_create_band);
+            } else {
+                if(info.getBands().size() == 1) {
+                    navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(0));
+                    navigationView.setCheckedItem(R.id.nav_create_band);
+                } else {
+                    navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(1));
+                    navigationView.setCheckedItem(R.id.nav_choose_band);
+                }
+            }
+        }
     }
 
     @Override

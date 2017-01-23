@@ -2,6 +2,8 @@ package com.zpjj.musicapp.musicianmanagementapp.models;
 
 import com.google.firebase.auth.FirebaseUser;
 
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,9 +11,9 @@ import java.util.Map;
  * Created by daniel on 15.01.17.
  */
 
-public class UserInfo {
+public class UserInfo implements Serializable{
     private String email;
-    private Map<String,Band> bands;
+    private Map<String,Boolean> bands = new HashMap<>();
 
     public String getEmail() {
         return email;
@@ -21,11 +23,11 @@ public class UserInfo {
         this.email = email;
     }
 
-    public Map<String, Band> getUserBands() {
+    public Map<String, Boolean> getBands() {
         return bands;
     }
 
-    public void setUserBands(Map<String, Band> userBands) {
-        this.bands = userBands;
+    public void setBands(Map<String, Boolean> bands) {
+        this.bands = bands;
     }
 }

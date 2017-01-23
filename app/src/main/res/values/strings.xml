@@ -16,6 +16,7 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="band_name">band_name</string>
+    <string name="band_name">Nazwa zespołu</string>
     <string name="title_activity_create_band">Utwórz zespół</string>
+    <string name="choose_band">Wybierz zespół</string>
 </resources>

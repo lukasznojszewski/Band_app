@@ -13,6 +13,7 @@ public class Band {
     private String id;
     private String name;
     private String masterUID;
+    private Map<String,Boolean> userJoinRequest = new HashMap<>();
     private Map<String, Boolean> users = new HashMap<>();
 
     public Band() {
@@ -49,6 +50,14 @@ public class Band {
         this.masterUID = masterUID;
     }
 
+    public Map<String, Boolean> getUserJoinRequest() {
+        return userJoinRequest;
+    }
+
+    public void setUserJoinRequest(Map<String, Boolean> userJoinRequest) {
+        this.userJoinRequest = userJoinRequest;
+    }
+
     public Map<String, Boolean> getUsers() {
         return users;
     }
@@ -60,5 +69,14 @@ public class Band {
     @Override
     public String toString() {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(((Band)obj).getId().equals(this.getId())) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

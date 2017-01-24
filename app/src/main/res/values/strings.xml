@@ -19,4 +19,10 @@
     <string name="band_name">Nazwa zespołu</string>
     <string name="title_activity_create_band">Utwórz zespół</string>
     <string name="choose_band">Wybierz zespół</string>
+    <string name="join_band">Dołącz do zespołu</string>
+    <string name="ic_join_band">Dołącz do zespołu</string>
+    <string name="ic_join_band_request">Prośby o dołączenie</string>
+    <string name="confirm_join_band">Zatwierdź dołączenie</string>
+    <string name="reject_join_band">Odrzuć</string>
+    <string name="accept_join_band">Akceptuj</string>
 </resources>

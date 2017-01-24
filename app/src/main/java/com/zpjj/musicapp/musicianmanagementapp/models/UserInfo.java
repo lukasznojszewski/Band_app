@@ -12,9 +12,17 @@ import java.util.Map;
  */
 
 public class UserInfo implements Serializable{
+    private String id;
     private String email;
+    private String firebaseToken;
     private Map<String,Boolean> bands = new HashMap<>();
+    public String getId() {
+        return id;
+    }
 
+    public void setId(String id) {
+        this.id = id;
+    }
     public String getEmail() {
         return email;
     }
@@ -23,11 +31,25 @@ public class UserInfo implements Serializable{
         this.email = email;
     }
 
+    public String getFirebaseToken() {
+        return firebaseToken;
+    }
+
+
+    public void setFirebaseToken(String firebaseToken) {
+        this.firebaseToken = firebaseToken;
+    }
+
     public Map<String, Boolean> getBands() {
         return bands;
     }
 
     public void setBands(Map<String, Boolean> bands) {
         this.bands = bands;
+    }
+
+    @Override
+    public String toString() {
+        return email;
     }
 }

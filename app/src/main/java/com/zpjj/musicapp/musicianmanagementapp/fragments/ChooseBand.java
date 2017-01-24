@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -13,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.zpjj.musicapp.musicianmanagementapp.R;
 import com.zpjj.musicapp.musicianmanagementapp.activities.BaseAuthActivity;
@@ -56,29 +58,73 @@ public class ChooseBand extends Fragment {
             onChooseBand();
         });
         BandService bandService = new BandService();
-        for (String bandId: ((BaseAuthActivity)getActivity()).getUserInfo().getBands().keySet()) {
-               bandService.getBandById(bandId).subscribe(
-                       band -> {
-                            bandList.add(band);
-                       }
-               );
-        }
-        if(((BaseAuthActivity) getActivity()).getSelectedBand() != null) {
+        Observable.create(
+                subscriber -> {
+                    for (String bandId: ((BaseAuthActivity)getActivity()).getUserInfo().getBands().keySet()) {
+                        bandService.getBandById(bandId).subscribe(
+                                band -> {
+                                    subscriber.onNext(band);
+                                    if(((BaseAuthActivity)getActivity()).getUserInfo().getBands().keySet().size() == bandList.size()) {
+                                        subscriber.onCompleted();
+                                    }
+                                }
+                        );
+                    }
+                }
+        ).subscribe(
+                band ->  {
+                    bandList.add((Band) band);
+                },
+                err -> {
+                    err.printStackTrace();
+                },
+                () -> {
+                    if(((BaseAuthActivity) getActivity()).getSelectedBand() != null) {
+                        bandListSpinner.setSelection(bandListAdapter.getPosition(((BaseAuthActivity) getActivity()).getSelectedBand()));
+                    } else {
+                        bandListSpinner.setSelection(0);
+                    }
 
-        }
+                }
+        );
         return view;
     }
 
     private void onChooseBand() {
-        System.out.println(bandListSpinner.getSelectedItem());
-        ((BaseAuthActivity)getActivity()).setSelectedBand((Band) bandListSpinner.getSelectedItem());
+        if(bandListSpinner.getSelectedItem() != null) {
+            ((BaseAuthActivity)getActivity()).setSelectedBand((Band) bandListSpinner.getSelectedItem());
+            updateMenuItemList();
+            navigateToCurrentSong();
+            updateAppTitleInMenu();
+        } else {
+            Toast.makeText(getContext(), "Wybierz zespół",
+                    Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+    private void updateMenuItemList() {
+        String currentUserId = ((BaseAuthActivity) getActivity()).mAuth.getCurrentUser().getUid();
+        String selectedBandMasterId = ((Band) bandListSpinner.getSelectedItem()).getMasterUID();
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+        Menu menu = navigationView.getMenu();
+        if(currentUserId.equals(selectedBandMasterId)) {
+            menu.setGroupVisible(R.id.nav_master_band_items, true);
+        } else {
+            menu.setGroupVisible(R.id.nav_master_band_items, false);
+        }
+    }
+
+    private void navigateToCurrentSong() {
         NavigationListener navigationListener = new NavigationListener((BaseAuthActivity)getActivity());
         NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(0));
+        navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(NavigationListener.CURRENT_SONG));
         navigationView.setCheckedItem(R.id.nav_current_song);
+    }
+
+    private void updateAppTitleInMenu() {
         TextView navAppName = (TextView) getActivity().findViewById(R.id.nav_app_title);
         navAppName.setText("BandApp - " + ((Band) bandListSpinner.getSelectedItem()).getName());
-
     }
 
 }

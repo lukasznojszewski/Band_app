@@ -25,6 +25,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.zpjj.musicapp.musicianmanagementapp.R;
 import com.zpjj.musicapp.musicianmanagementapp.activities.auth.BaseActivity;
 import com.zpjj.musicapp.musicianmanagementapp.activities.MainActivity;
@@ -102,13 +104,25 @@ public class SignInTabFragment extends Fragment implements View.OnClickListener,
                             UserService userService = new UserService();
                             userService.getUserInfo(task.getResult().getUser()).subscribe(
                                     data -> {
+                                        if(data.getFirebaseToken() == null || data.getFirebaseToken().equals("")) {
+                                            String token = FirebaseInstanceId.getInstance().getToken();
+                                            userService.updateUserFirebaseId(task.getResult().getUser(), token);
+                                            data.setFirebaseToken(token);
+                                        }
+                                        if(data.getId() == null || data.getId().equals("")) {
+                                            data.setId(task.getResult().getUser().getUid());
+                                            userService.createOrUpdateUserInfo(task.getResult().getUser(), data);
+                                        }
                                         Intent i = new Intent(context, MainActivity.class);
                                         i.putExtra("USER_INFO", data);
                                         context.startActivity(i);
                                     }, err -> {
                                         if(err instanceof UserNotFoundException) {
                                             UserInfo info = new UserInfo();
+                                            info.setId(task.getResult().getUser().getUid());
                                             info.setEmail(task.getResult().getUser().getEmail());
+                                            String token = FirebaseInstanceId.getInstance().getToken();
+                                            info.setFirebaseToken(token);
                                             userService.createOrUpdateUserInfo(task.getResult().getUser(), info);
                                             Intent i = new Intent(context, MainActivity.class);
                                             i.putExtra("USER_INFO", info);
@@ -205,13 +219,26 @@ public class SignInTabFragment extends Fragment implements View.OnClickListener,
                             UserService userService = new UserService();
                             userService.getUserInfo(task.getResult().getUser()).subscribe(
                                         data -> {
+                                            if(data.getFirebaseToken() == null || data.getFirebaseToken().equals("")) {
+                                                String token = FirebaseInstanceId.getInstance().getToken();
+                                                userService.updateUserFirebaseId(task.getResult().getUser(), token);
+                                                data.setFirebaseToken(token);
+                                            }
+                                            if(data.getId() == null || data.getId().equals("")) {
+                                                data.setId(task.getResult().getUser().getUid());
+                                                userService.createOrUpdateUserInfo(task.getResult().getUser(), data);
+                                            }
                                             Intent i = new Intent(context, MainActivity.class);
                                             i.putExtra("USER_INFO", data);
                                             context.startActivity(i);
+
                                         }, err -> {
                                             if(err instanceof UserNotFoundException) {
                                                 UserInfo info = new UserInfo();
+                                                info.setId(task.getResult().getUser().getUid());
                                                 info.setEmail(task.getResult().getUser().getEmail());
+                                                String token = FirebaseInstanceId.getInstance().getToken();
+                                                info.setFirebaseToken(token);
                                                 userService.createOrUpdateUserInfo(task.getResult().getUser(), info);
                                                 Intent i = new Intent(context, MainActivity.class);
                                                 i.putExtra("USER_INFO", info);

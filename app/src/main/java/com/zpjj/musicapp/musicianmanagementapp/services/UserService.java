@@ -25,12 +25,16 @@ public class UserService {
                 subscriber.onError(new NullPointerException());
             });
         }
-        return (Observable<UserInfo>) RxFirebaseDatabase.observeSingleValueEvent(mDatabase.getReference("users").child(fbUser.getUid()),
+        return getUserInfo(fbUser.getUid());
+    }
+
+    public Observable<UserInfo> getUserInfo(String userId) {
+        return (Observable<UserInfo>) RxFirebaseDatabase.observeSingleValueEvent(mDatabase.getReference("users").child(userId),
                 dataSnapshot -> {
                     UserInfo info = new UserInfo();
                     info = dataSnapshot.getValue(UserInfo.class);
                     return  info;
-        }).flatMap(userInfo -> {
+                }).flatMap(userInfo -> {
             if(userInfo != null) {
                 return Observable.just(userInfo);
             }
@@ -53,4 +57,7 @@ public class UserService {
     }
 
 
+    public void updateUserFirebaseId(FirebaseUser currentUser, String refreshedToken) {
+        mDatabase.getReference("users").child(currentUser.getUid()).child("firebaseToken").setValue(refreshedToken);
+    }
 }

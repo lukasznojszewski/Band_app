@@ -42,14 +42,14 @@ public class MainActivity extends BaseAuthActivity {
         } else {
             setUserInfo(info);
             if(info.getBands().size() == 0) {
-                navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(2));
+                navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(NavigationListener.CREATE_BAND));
                 navigationView.setCheckedItem(R.id.nav_create_band);
             } else {
                 if(info.getBands().size() == 1) {
-                    navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(0));
-                    navigationView.setCheckedItem(R.id.nav_create_band);
+                    navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(NavigationListener.CHOOSE_BAND));
+                    navigationView.setCheckedItem(R.id.nav_choose_band);
                 } else {
-                    navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(1));
+                    navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(NavigationListener.CHOOSE_BAND));
                     navigationView.setCheckedItem(R.id.nav_choose_band);
                 }
             }

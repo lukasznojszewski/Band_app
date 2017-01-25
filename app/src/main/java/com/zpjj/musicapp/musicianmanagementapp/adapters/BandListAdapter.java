@@ -38,5 +38,5 @@ public class BandListAdapter extends ArrayAdapter<Band> {
 
         return label;
     }
-
+    
 }

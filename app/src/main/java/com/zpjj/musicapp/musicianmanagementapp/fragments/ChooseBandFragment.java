@@ -30,12 +30,12 @@ import java.util.List;
 import rx.Observable;
 
 
-public class ChooseBand extends Fragment {
+public class ChooseBandFragment extends Fragment {
     Spinner bandListSpinner;
     Button chooseBandButton;
     List<Band> bandList = new ArrayList<>();
     BandListAdapter bandListAdapter;
-    public ChooseBand() {
+    public ChooseBandFragment() {
 
     }
 

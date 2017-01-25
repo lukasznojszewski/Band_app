@@ -57,6 +57,6 @@ public class AddBandFragment extends Fragment {
             userService.createOrUpdateUserInfo(((BaseAuthActivity)getActivity()).mAuth.getCurrentUser(), info);
         }
         NavigationListener navigationListener = new NavigationListener((BaseAuthActivity)getActivity());
-        navigationListener.changeFragment((BaseAuthActivity)getActivity(), ChooseBand.class, R.id.nav_choose_band);
+        navigationListener.changeFragment((BaseAuthActivity)getActivity(), ChooseBandFragment.class, R.id.nav_choose_band);
     }
 }

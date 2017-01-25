@@ -25,4 +25,9 @@
     <string name="confirm_join_band">Zatwierdź dołączenie</string>
     <string name="reject_join_band">Odrzuć</string>
     <string name="accept_join_band">Akceptuj</string>
+    <string name="addSong">Dodaj Piosenkę</string>
+    <string name="author">Autor</string>
+    <string name="title">Tytuł</string>
+    <string name="ic_choose_current_song">Wybierz piosenkę</string>
+    <string name="current_song_not_set">Nie ustawiono bieżącej piosenki</string>
 </resources>

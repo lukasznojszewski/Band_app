@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:checkableBehavior="single">
+    <group  android:id="@+id/nav_master_band_items" android:visible="false">
+        <item
+            android:id="@+id/nav_band_join_request"
+            android:icon="@mipmap/ic_current_song"
+            android:title="@string/ic_join_band_request"></item>
+        <item
+            android:id="@+id/nav_choose_current_song"
+            android:icon="@mipmap/ic_current_song"
+            android:title="@string/ic_choose_current_song"></item>
+    </group>
+    <group android:checkableBehavior="single" android:id="@+id/nav_master_and_slave_items">
         <item
             android:id="@+id/nav_current_song"
+            android:icon="@mipmap/ic_current_song"
             android:title="@string/currentSong" />
         <item
+            android:id="@+id/nav_choose_band"
+            android:icon="@mipmap/ic_current_song"
+            android:title="@string/choose_band" />
+        <item
+            android:id="@+id/nav_create_band"
+            android:icon="@mipmap/ic_current_song"
+            android:title="@string/title_activity_create_band" />
+        <item
+            android:id="@+id/nav_join_band"
+            android:icon="@mipmap/ic_current_song"
+            android:title="@string/ic_join_band"></item>
+        <item
             android:id="@+id/nav_logout"
+            android:icon="@mipmap/ic_current_song"
             android:title="@string/logout" />
     </group>
 </menu>

@@ -25,12 +25,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.zpjj.musicapp.musicianmanagementapp.R;
-import com.zpjj.musicapp.musicianmanagementapp.activities.BaseActivity;
+import com.zpjj.musicapp.musicianmanagementapp.activities.auth.BaseActivity;
 import com.zpjj.musicapp.musicianmanagementapp.activities.MainActivity;
 import com.zpjj.musicapp.musicianmanagementapp.activities.auth.AuthActivity;
-
-import java.util.concurrent.Executor;
+import com.zpjj.musicapp.musicianmanagementapp.exceptions.UserNotFoundException;
+import com.zpjj.musicapp.musicianmanagementapp.models.UserInfo;
+import com.zpjj.musicapp.musicianmanagementapp.services.UserService;
 
 public class SignInTabFragment extends Fragment implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "AUTH";
@@ -97,11 +100,41 @@ public class SignInTabFragment extends Fragment implements View.OnClickListener,
                             Toast.makeText(context, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            Intent i = new Intent(context, MainActivity.class);
-                            startActivity(i);
+                            Log.d(TAG, task.getResult().getUser().getUid());
+                            UserService userService = new UserService();
+                            userService.getUserInfo(task.getResult().getUser()).subscribe(
+                                    data -> {
+                                        if(data.getFirebaseToken() == null || data.getFirebaseToken().equals("")) {
+                                            String token = FirebaseInstanceId.getInstance().getToken();
+                                            userService.updateUserFirebaseId(task.getResult().getUser(), token);
+                                            data.setFirebaseToken(token);
+                                        }
+                                        if(data.getId() == null || data.getId().equals("")) {
+                                            data.setId(task.getResult().getUser().getUid());
+                                            userService.createOrUpdateUserInfo(task.getResult().getUser(), data);
+                                        }
+                                        Intent i = new Intent(context, MainActivity.class);
+                                        i.putExtra("USER_INFO", data);
+                                        context.startActivity(i);
+                                    }, err -> {
+                                        if(err instanceof UserNotFoundException) {
+                                            UserInfo info = new UserInfo();
+                                            info.setId(task.getResult().getUser().getUid());
+                                            info.setEmail(task.getResult().getUser().getEmail());
+                                            String token = FirebaseInstanceId.getInstance().getToken();
+                                            info.setFirebaseToken(token);
+                                            userService.createOrUpdateUserInfo(task.getResult().getUser(), info);
+                                            Intent i = new Intent(context, MainActivity.class);
+                                            i.putExtra("USER_INFO", info);
+                                            context.startActivity(i);
+                                        }
+                                    }
+                            );
+
                         }
                     }
                 });
+
     }
 
 
@@ -171,19 +204,49 @@ public class SignInTabFragment extends Fragment implements View.OnClickListener,
         Log.d(TAG, "firebaseAuthWithGoogle:" + account.getId());
         AuthActivity context = (AuthActivity) getActivity();
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+        context.showProgressDialog();
         ((BaseActivity)getActivity()).mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(context, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
-
+                        context.hideProgressDialog();
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithCredential", task.getException());
                             Toast.makeText(context, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            Intent i = new Intent(context, MainActivity.class);
-                            startActivity(i);
+                            UserService userService = new UserService();
+                            userService.getUserInfo(task.getResult().getUser()).subscribe(
+                                        data -> {
+                                            if(data.getFirebaseToken() == null || data.getFirebaseToken().equals("")) {
+                                                String token = FirebaseInstanceId.getInstance().getToken();
+                                                userService.updateUserFirebaseId(task.getResult().getUser(), token);
+                                                data.setFirebaseToken(token);
+                                            }
+                                            if(data.getId() == null || data.getId().equals("")) {
+                                                data.setId(task.getResult().getUser().getUid());
+                                                userService.createOrUpdateUserInfo(task.getResult().getUser(), data);
+                                            }
+                                            Intent i = new Intent(context, MainActivity.class);
+                                            i.putExtra("USER_INFO", data);
+                                            context.startActivity(i);
+
+                                        }, err -> {
+                                            if(err instanceof UserNotFoundException) {
+                                                UserInfo info = new UserInfo();
+                                                info.setId(task.getResult().getUser().getUid());
+                                                info.setEmail(task.getResult().getUser().getEmail());
+                                                String token = FirebaseInstanceId.getInstance().getToken();
+                                                info.setFirebaseToken(token);
+                                                userService.createOrUpdateUserInfo(task.getResult().getUser(), info);
+                                                Intent i = new Intent(context, MainActivity.class);
+                                                i.putExtra("USER_INFO", info);
+                                                context.startActivity(i);
+                                            }
+                                        }
+                                );
+
                         }
                     }
                 });
@@ -193,4 +256,7 @@ public class SignInTabFragment extends Fragment implements View.OnClickListener,
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+
+
+
 }

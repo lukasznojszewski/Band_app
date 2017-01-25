@@ -1,4 +1,4 @@
-package com.zpjj.musicapp.musicianmanagementapp.activities;
+package com.zpjj.musicapp.musicianmanagementapp.activities.auth;
 
 import android.app.ProgressDialog;
 import android.support.annotation.VisibleForTesting;
@@ -28,6 +28,7 @@ public class BaseActivity extends AppCompatActivity {
     public void logout() {
         mAuth.signOut();
     }
+
     public void showProgressDialog() {
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(this);
@@ -48,21 +49,5 @@ public class BaseActivity extends AppCompatActivity {
     public void onStop() {
         super.onStop();
         hideProgressDialog();
-    }
-
-    public DrawerLayout getmDrawer() {
-        return mDrawer;
-    }
-
-    public void setmDrawer(DrawerLayout mDrawer) {
-        this.mDrawer = mDrawer;
-    }
-
-    public Toolbar getToolbar() {
-        return toolbar;
-    }
-
-    public void setToolbar(Toolbar toolbar) {
-        this.toolbar = toolbar;
     }
 }

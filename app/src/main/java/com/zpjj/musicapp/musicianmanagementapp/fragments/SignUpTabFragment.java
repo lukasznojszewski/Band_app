@@ -21,6 +21,8 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.zpjj.musicapp.musicianmanagementapp.R;
 import com.zpjj.musicapp.musicianmanagementapp.activities.MainActivity;
 import com.zpjj.musicapp.musicianmanagementapp.activities.auth.AuthActivity;
+import com.zpjj.musicapp.musicianmanagementapp.models.UserInfo;
+import com.zpjj.musicapp.musicianmanagementapp.services.UserService;
 
 
 public class SignUpTabFragment extends Fragment {
@@ -64,8 +66,6 @@ public class SignUpTabFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
-
-                context.hideProgressDialog();
                 if (!task.isSuccessful()) {
                    if(task.getException() instanceof FirebaseAuthUserCollisionException) {
                        Toast.makeText(context, "Użytkownik już istnieje",
@@ -79,6 +79,7 @@ public class SignUpTabFragment extends Fragment {
                 } else {
                     context.mViewPager.setCurrentItem(0);
                 }
+                context.hideProgressDialog();
             }
         });
     }

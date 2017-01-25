@@ -15,7 +15,8 @@ import com.zpjj.musicapp.musicianmanagementapp.activities.auth.AuthActivity;
 import com.zpjj.musicapp.musicianmanagementapp.activities.BaseAuthActivity;
 import com.zpjj.musicapp.musicianmanagementapp.fragments.AcceptJoinBandFragment;
 import com.zpjj.musicapp.musicianmanagementapp.fragments.AddBandFragment;
-import com.zpjj.musicapp.musicianmanagementapp.fragments.ChooseBand;
+import com.zpjj.musicapp.musicianmanagementapp.fragments.ChooseBandFragment;
+import com.zpjj.musicapp.musicianmanagementapp.fragments.ChooseCurrentSongFragment;
 import com.zpjj.musicapp.musicianmanagementapp.fragments.CurrentSongFragment;
 import com.zpjj.musicapp.musicianmanagementapp.fragments.JoinExistingBandFragment;
 
@@ -25,11 +26,12 @@ import com.zpjj.musicapp.musicianmanagementapp.fragments.JoinExistingBandFragmen
 
 public class NavigationListener implements NavigationView.OnNavigationItemSelectedListener {
     public static final int ACCEPT_JOIN_REQUEST = 0;
-    public static final int CURRENT_SONG = 1;
-    public static final int CHOOSE_BAND = 2;
-    public static final int CREATE_BAND = 3;
-    public static final int JOIN_BAND = 4;
-    public static final int LOGOUT = 5;
+    public static final int CHOOSE_CURRENT_SONG = 1;
+    public static final int CURRENT_SONG = 2;
+    public static final int CHOOSE_BAND = 3;
+    public static final int CREATE_BAND = 4;
+    public static final int JOIN_BAND = 5;
+    public static final int LOGOUT = 6;
 
 
     BaseAuthActivity authActivity;
@@ -48,12 +50,16 @@ public class NavigationListener implements NavigationView.OnNavigationItemSelect
                 changeFragment(authActivity, AcceptJoinBandFragment.class, R.id.content_main);
                 authActivity.setTitle(item.getTitle());
                 break;
+            case R.id.nav_choose_current_song:
+                changeFragment(authActivity, ChooseCurrentSongFragment.class, R.id.content_main);
+                authActivity.setTitle(item.getTitle());
+                break;
             case R.id.nav_current_song:
                 changeFragment(authActivity, CurrentSongFragment.class, R.id.content_main);
                 authActivity.setTitle(item.getTitle());
                 break;
             case R.id.nav_choose_band:
-                changeFragment(authActivity, ChooseBand.class, R.id.content_main);
+                changeFragment(authActivity, ChooseBandFragment.class, R.id.content_main);
                 authActivity.setTitle(item.getTitle());
                 break;
             case R.id.nav_create_band:

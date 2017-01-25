@@ -5,6 +5,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.kelvinapps.rxfirebase.DataSnapshotMapper;
 import com.kelvinapps.rxfirebase.RxFirebaseDatabase;
 import com.zpjj.musicapp.musicianmanagementapp.models.Band;
+import com.zpjj.musicapp.musicianmanagementapp.models.Song;
 import com.zpjj.musicapp.musicianmanagementapp.models.UserInfo;
 
 import java.util.ArrayList;
@@ -62,6 +63,10 @@ public class BandService {
         });
     }
 
+    public Observable<Song> getCurrentSongForBand(String bandId) {
+        return RxFirebaseDatabase.observeSingleValueEvent(mDatabase.getReference("bands").child(bandId).child("currentSong"), Song.class);
+    }
+
     public void createUserJoinBandRequest(Band band, FirebaseUser currentUser) {
         mDatabase.getReference("bands").child(band.getId()).child("userJoinRequest").child(currentUser.getUid()).setValue(true);
     }
@@ -74,5 +79,13 @@ public class BandService {
 
     public void rejectUserJoindRequest(Band band, String userId) {
         mDatabase.getReference("bands").child(band.getId()).child("userJoinRequest").child(userId).removeValue();
+    }
+
+    public void addSongForBand(String currentBandId, Song song) {
+        mDatabase.getReference("bands").child(currentBandId).child("songs").child(song.getId()).setValue(song);
+    }
+
+    public void setCurrentSongForBand(String currentBandId, Song song) {
+        mDatabase.getReference("bands").child(currentBandId).child("currentSong").setValue(song);
     }
 }

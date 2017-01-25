@@ -15,6 +15,7 @@ public class Band {
     private String masterUID;
     private Map<String,Boolean> userJoinRequest = new HashMap<>();
     private Map<String, Boolean> users = new HashMap<>();
+    private Map<String, Song> songs = new HashMap<>();
 
     public Band() {
     }
@@ -64,6 +65,14 @@ public class Band {
 
     public void setUsers(Map<String, Boolean> users) {
         this.users = users;
+    }
+
+    public Map<String, Song> getSongs() {
+        return songs;
+    }
+
+    public void setSongs(Map<String, Song> songs) {
+        this.songs = songs;
     }
 
     @Override

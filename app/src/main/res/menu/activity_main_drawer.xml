@@ -5,6 +5,10 @@
             android:id="@+id/nav_band_join_request"
             android:icon="@mipmap/ic_current_song"
             android:title="@string/ic_join_band_request"></item>
+        <item
+            android:id="@+id/nav_choose_current_song"
+            android:icon="@mipmap/ic_current_song"
+            android:title="@string/ic_choose_current_song"></item>
     </group>
     <group android:checkableBehavior="single" android:id="@+id/nav_master_and_slave_items">
         <item

@@ -34,7 +34,10 @@ public class BandService {
                     Band band = new Band();
                     band = dataSnapshot.getValue(Band.class);
                     return  band;
-                });
+                }).onErrorResumeNext(throwable -> {
+            System.out.println(throwable.getMessage());
+            return Observable.empty();
+        });
     }
 
     public Observable<List<Band>> getBands() {
@@ -54,6 +57,8 @@ public class BandService {
                                             subscriber.onNext(users);
                                             subscriber.onCompleted();
                                         }
+                                    }, err -> {
+                                        System.out.println(err.getMessage());
                                     }
                             );
                         }

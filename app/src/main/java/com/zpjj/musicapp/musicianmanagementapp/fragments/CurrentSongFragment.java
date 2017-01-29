@@ -6,12 +6,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.zpjj.musicapp.musicianmanagementapp.R;
 import com.zpjj.musicapp.musicianmanagementapp.activities.BaseAuthActivity;
 import com.zpjj.musicapp.musicianmanagementapp.activities.auth.BaseActivity;
 import com.zpjj.musicapp.musicianmanagementapp.services.BandService;
+import com.zpjj.musicapp.musicianmanagementapp.services.NotifyService;
 
 import java.util.Date;
 import java.util.Timer;
@@ -22,7 +24,9 @@ public class CurrentSongFragment extends Fragment {
     TextView authorTextView;
     TextView titleTextView;
     Timer t;
+    NotifyService notifyService;
     public CurrentSongFragment() {
+        notifyService = new NotifyService();
     }
 
     @Override
@@ -50,13 +54,15 @@ public class CurrentSongFragment extends Fragment {
     }
 
     private void refreshCurrentSong() {
-        String currentBandId = ((BaseAuthActivity)getActivity()).getSelectedBand().getId();
-        mBandService.getCurrentSongForBand(currentBandId).subscribe(song -> {
-            if(song!= null) {
-                authorTextView.setText(song.getAuthor());
-                titleTextView.setText(song.getTitle());
-            }
-        });
+        if(((BaseAuthActivity)getActivity()).getSelectedBand() != null) {
+            String currentBandId = ((BaseAuthActivity)getActivity()).getSelectedBand().getId();
+            mBandService.getCurrentSongForBand(currentBandId).subscribe(song -> {
+                if(song!= null) {
+                    authorTextView.setText(song.getAuthor());
+                    titleTextView.setText(song.getTitle());
+                }
+            });
+        }
     }
 
     @Override

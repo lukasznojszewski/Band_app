@@ -16,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.FirebaseDatabase;
 import com.zpjj.musicapp.musicianmanagementapp.R;
 import com.zpjj.musicapp.musicianmanagementapp.activities.BaseAuthActivity;
 import com.zpjj.musicapp.musicianmanagementapp.activities.auth.BaseActivity;
@@ -23,6 +24,7 @@ import com.zpjj.musicapp.musicianmanagementapp.adapters.BandListAdapter;
 import com.zpjj.musicapp.musicianmanagementapp.models.Band;
 import com.zpjj.musicapp.musicianmanagementapp.navigation.NavigationListener;
 import com.zpjj.musicapp.musicianmanagementapp.services.BandService;
+import com.zpjj.musicapp.musicianmanagementapp.services.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,16 +62,26 @@ public class ChooseBandFragment extends Fragment {
         BandService bandService = new BandService();
         Observable.create(
                 subscriber -> {
-                    for (String bandId: ((BaseAuthActivity)getActivity()).getUserInfo().getBands().keySet()) {
-                        bandService.getBandById(bandId).subscribe(
-                                band -> {
-                                    subscriber.onNext(band);
-                                    if(((BaseAuthActivity)getActivity()).getUserInfo().getBands().keySet().size() == bandList.size()) {
-                                        subscriber.onCompleted();
+                    UserService us = new UserService();
+                    us.getUserInfo(((BaseAuthActivity)getActivity()).getUserInfo().getId()).subscribe(info -> {
+                        ((BaseAuthActivity)getActivity()).setUserInfo(info);
+                        for (String bandId: ((BaseAuthActivity)getActivity()).getUserInfo().getBands().keySet()) {
+                            bandService.getBandById(bandId).subscribe(
+                                    band -> {
+                                        subscriber.onNext(band);
+                                        if(((BaseAuthActivity)getActivity()).getUserInfo().getBands().keySet().size() == bandList.size()) {
+                                            subscriber.onCompleted();
+                                        }
+                                    },
+                                    err-> {
+                                        ((BaseAuthActivity)getActivity()).logout();
                                     }
-                                }
-                        );
-                    }
+                            );
+                        }
+                    }, throwable -> {
+                        ((BaseAuthActivity)getActivity()).logout();
+                    });
+
                 }
         ).subscribe(
                 band ->  {
@@ -94,7 +106,10 @@ public class ChooseBandFragment extends Fragment {
         if(bandListSpinner.getSelectedItem() != null) {
             ((BaseAuthActivity)getActivity()).setSelectedBand((Band) bandListSpinner.getSelectedItem());
             updateMenuItemList();
-            navigateToCurrentSong();
+            NavigationListener listener = new NavigationListener((BaseAuthActivity) getActivity());
+            if(!listener.redirectOnNotify((BaseAuthActivity) getActivity())) {
+                navigateToCurrentSong();
+            }
             updateAppTitleInMenu();
         } else {
             Toast.makeText(getContext(), "Wybierz zespół",

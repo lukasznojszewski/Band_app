@@ -39,6 +39,9 @@ public class UserService {
                 return Observable.just(userInfo);
             }
             return Observable.error(new UserNotFoundException());
+        }).onErrorResumeNext(throwable -> {
+            System.out.println(throwable.getMessage());
+            return Observable.empty();
         });
 
     }

@@ -19,6 +19,8 @@ import com.zpjj.musicapp.musicianmanagementapp.activities.BaseAuthActivity;
 import com.zpjj.musicapp.musicianmanagementapp.models.Band;
 import com.zpjj.musicapp.musicianmanagementapp.models.UserInfo;
 import com.zpjj.musicapp.musicianmanagementapp.services.BandService;
+import com.zpjj.musicapp.musicianmanagementapp.services.NotifyService;
+import com.zpjj.musicapp.musicianmanagementapp.services.UserService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,6 +53,9 @@ public class AcceptJoinBandFragment extends Fragment {
                 userInfos -> {
                     arrayList.addAll(userInfos);
                     arrayAdapter.notifyDataSetChanged();
+                },
+                err-> {
+                    ((BaseAuthActivity)getActivity()).logout();
                 }
         );
         listView.setAdapter(arrayAdapter);
@@ -74,11 +79,13 @@ public class AcceptJoinBandFragment extends Fragment {
         Button reject = (Button) dialog.findViewById(R.id.reject_join_band_button);
         reject.setOnClickListener(l-> {
             mBandService.rejectUserJoindRequest(currentBand, info.getId());
+            ((BaseAuthActivity)getActivity()).getNotifyService().sendRejectJoinBandNotification(info.getFirebaseToken());
             dialog.dismiss();
         });
         Button accept = (Button) dialog.findViewById(R.id.accept_join_band_button);
         accept.setOnClickListener(l-> {
             mBandService.acceptUserJoinRequest(currentBand, info.getId());
+            ((BaseAuthActivity)getActivity()).getNotifyService().sendAcceptJoinBandNotification(info.getFirebaseToken());
             dialog.dismiss();
         });
         dialog.show();

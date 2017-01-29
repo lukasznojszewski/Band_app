@@ -20,6 +20,7 @@ import com.zpjj.musicapp.musicianmanagementapp.adapters.SongListAdapter;
 import com.zpjj.musicapp.musicianmanagementapp.models.Song;
 import com.zpjj.musicapp.musicianmanagementapp.models.UserInfo;
 import com.zpjj.musicapp.musicianmanagementapp.services.BandService;
+import com.zpjj.musicapp.musicianmanagementapp.services.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +34,10 @@ public class ChooseCurrentSongFragment extends Fragment {
     Button mAddSongButton;
     ListView listView;
     BandService mBandService;
+    UserService mUserService;
     public ChooseCurrentSongFragment() {
         mBandService = new BandService();
+        mUserService = new UserService();
     }
 
     @Override
@@ -63,6 +66,15 @@ public class ChooseCurrentSongFragment extends Fragment {
                 mBandService.setCurrentSongForBand(currentBandId, songs.get(position));
                 Toast t = Toast.makeText(getContext(), "Wybrano nową piosenkę", Toast.LENGTH_LONG);
                 t.show();
+                for (String userId:
+                ((BaseAuthActivity)getActivity()).getSelectedBand().getUsers().keySet()) {
+                    mUserService.getUserInfo(userId).subscribe(info -> {
+                        ((BaseAuthActivity)getActivity()).getNotifyService().sendChangeSongNotification(info.getFirebaseToken(), songs.get(position));
+
+                    }, err-> {
+                                ((BaseAuthActivity)getActivity()).logout();
+                            });
+                }
             }
         };
 
@@ -109,6 +121,9 @@ public class ChooseCurrentSongFragment extends Fragment {
                     songs = new ArrayList<Song>(band.getSongs().values());
                     arrayAdapter = new SongListAdapter(getContext(), songs);
                     listView.setAdapter(arrayAdapter);
+                },
+                err-> {
+                    ((BaseAuthActivity)getActivity()).logout();
                 }
         );
     }

@@ -2,11 +2,13 @@ package com.zpjj.musicapp.musicianmanagementapp.models;
 
 import com.zpjj.musicapp.musicianmanagementapp.utils.Utils;
 
+import java.io.Serializable;
+
 /**
  * Created by daniel on 24.01.17.
  */
 
-public class Song {
+public class Song implements Serializable{
     private String id;
     private String author;
     private String title;

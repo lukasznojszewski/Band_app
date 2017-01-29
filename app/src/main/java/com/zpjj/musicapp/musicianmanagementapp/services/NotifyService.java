@@ -2,95 +2,106 @@ package com.zpjj.musicapp.musicianmanagementapp.services;
 
 import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.messaging.FirebaseMessagingService;
-import com.google.firebase.messaging.RemoteMessage;
 import com.google.gson.Gson;
 import com.kelvinapps.rxfirebase.RxFirebaseDatabase;
-import com.zpjj.musicapp.musicianmanagementapp.models.Band;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.zpjj.musicapp.musicianmanagementapp.models.Song;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 /**
- * Created by daniel on 23.01.17.
+ * Created by daniel on 28.01.17.
  */
 
-public class NotifyService extends FirebaseMessagingService {
-
-    private static final String TAG = "FCM Service";
+public class NotifyService {
+    private static final String TAG = "Notify Service";
     private String serverKey = null;
     private String senderId = null;
 
     public NotifyService() {
         RxFirebaseDatabase.observeSingleValueEvent(FirebaseDatabase.getInstance().getReference("firebaseServer")).subscribe(
                 dataSnapshot -> {
-                    if(dataSnapshot.hasChild("id")) {
+                    if (dataSnapshot.hasChild("id")) {
                         senderId = dataSnapshot.child("id").getValue().toString();
                     }
-                    if(dataSnapshot.hasChild("key")) {
+                    if (dataSnapshot.hasChild("key")) {
                         serverKey = dataSnapshot.child("key").getValue().toString();
                     }
                 }
         );
     }
 
-    @Override
-    public void onMessageReceived(RemoteMessage remoteMessage) {
-        // TODO: Handle FCM messages here.
-        // If the application is in the foreground handle both data and notification messages here.
-        // Also if you intend on generating your own notifications as a result of a received FCM
-        // message, here is where that should be initiated.
-        Log.d(TAG, "From: " + remoteMessage.getFrom());
-        Log.d(TAG, "Notification Message Body: " + remoteMessage.getNotification().getBody());
-        Toast toast = Toast.makeText(getApplicationContext(), "Notification", Toast.LENGTH_LONG);
-        toast.show();
+    public void sendChangeSongNotification(String to, Song song) {
+        Notification n = new Notification(song.getAuthor() + " - " + song.getTitle(), "Zmiana piosenki");
+        try {
+            sendNotification(n, to, FirebaseService.ENotifyType.CHANGE_SONG);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-
-
-    public void notifyBandMasterAboutJoinRequest(Band selectedItem) {
-//        UserService userService = new UserService();
-//        userService.getUserInfo(selectedItem.getMasterUID()).subscribe(u -> {
-//            try {
-//                sendNotification(selectedItem, u.getFirebaseToken());
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//        });
+    public void sendAcceptJoinBandNotification(String to) {
+        Notification n = new Notification("Zakceptowano prośbę dołączenia do zespołu", "Band App");
+        try {
+            sendNotification(n, to, FirebaseService.ENotifyType.JOIN_BAND_RESPONSE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void sendNotification(Object message, String to) throws IOException, JSONException {
-        Handler h = new Handler();
+    public void sendRejectJoinBandNotification(String to) {
+        Notification n = new Notification("Odrzucono prośbę dołączenia do zespołu", "Band App");
+        try {
+            sendNotification(n, to, FirebaseService.ENotifyType.JOIN_BAND_RESPONSE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-        LoadingThread thread = new LoadingThread(message,to, serverKey);
+    public void sendJoinRequestNotification(String to) {
+        Notification n = new Notification("Nowa prośba o dołączenie do zespołu", "Band App");
+        try {
+            sendNotification(n, to, FirebaseService.ENotifyType.JOIN_BAND_REQUEST);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendTestNotification() {
+        Notification n = new Notification("Title", "Body");
+        try {
+            sendNotification(n, "fvTOrBNf7q0:APA91bEsXPWXCygNVQYlZGQn2y-EVBxaVozNLy4HR-w15TzVGCmaBj7KLvcSKLPbQURR7KpRGfkPvkGiAq3_7NLNR0ldH3zneSFJBKWxx68Ek5ZQ24GJ84qshB2EX4GRTfvhKe89unZX", FirebaseService.ENotifyType.JOIN_BAND_REQUEST);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendNotification(Notification message, String to, FirebaseService.ENotifyType type) throws IOException {
+        LoadingThread thread = new LoadingThread(message, to, serverKey, type);
         thread.start();
-
     }
 
     private class LoadingThread extends Thread {
         String serverKey;
         Object message;
         String to;
+        String type;
 
-        LoadingThread(Object message, String to, String serverKey) {
+        LoadingThread(Notification message, String to, String serverKey, FirebaseService.ENotifyType type) {
             this.message = message;
             this.to = to;
             this.serverKey = serverKey;
+            this.type = type.toString();
         }
 
         @Override
@@ -111,32 +122,27 @@ public class NotifyService extends FirebaseMessagingService {
                 con.setRequestMethod("POST");
                 con.connect();
                 Gson gson = new Gson();
-                JSONObject data = new JSONObject();
+                Map<String, Object> data = new HashMap<>();
                 data.put("to", to);
-                data.put("notification", gson.toJson(new Notification("Tytuł", "Body")));
-                Log.d(TAG,data.toString());
+                data.put("notification", message);
+                HashMap<String, String> notifyData = new HashMap<>();
+                notifyData.put("type", type);
+                data.put("data", notifyData);
+                Log.d(TAG, gson.toJson(data));
                 OutputStream os = con.getOutputStream();
-                os.write(data.toString().getBytes("UTF-8"));
+                os.write(gson.toJson(data).getBytes("UTF-8"));
                 os.close();
-
-
                 printConnection(con);
-
-
-
                 InputStream is = con.getInputStream();
                 String responseString = new Scanner(is, "UTF-8").useDelimiter("\\A").next();
                 is.close();
             } catch (IOException e) {
                 e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
             } finally {
-                if(con!= null) {
+                if (con != null) {
                     con.disconnect();
                 }
             }
-
 
         }
 
@@ -148,11 +154,10 @@ public class NotifyService extends FirebaseMessagingService {
                     .append("\n");
 
             Map<String, List<String>> map = con.getHeaderFields();
-            for (Map.Entry<String, List<String>> entry : map.entrySet())
-            {
+            for (Map.Entry<String, List<String>> entry : map.entrySet()) {
                 if (entry.getKey() == null)
                     continue;
-                builder.append( entry.getKey())
+                builder.append(entry.getKey())
                         .append(": ");
 
                 List<String> headerValues = entry.getValue();
@@ -198,5 +203,4 @@ public class NotifyService extends FirebaseMessagingService {
             this.title = title;
         }
     }
-
 }

@@ -2,6 +2,7 @@ package com.zpjj.musicapp.musicianmanagementapp.models;
 
 import com.zpjj.musicapp.musicianmanagementapp.utils.Utils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +10,7 @@ import java.util.Map;
  * Created by daniel on 22.01.17.
  */
 
-public class Band {
+public class Band implements Serializable{
     private String id;
     private String name;
     private String masterUID;

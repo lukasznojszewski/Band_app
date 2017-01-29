@@ -10,12 +10,16 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseUser;
 import com.zpjj.musicapp.musicianmanagementapp.R;
 import com.zpjj.musicapp.musicianmanagementapp.activities.BaseAuthActivity;
 import com.zpjj.musicapp.musicianmanagementapp.adapters.BandListAdapter;
 import com.zpjj.musicapp.musicianmanagementapp.models.Band;
+import com.zpjj.musicapp.musicianmanagementapp.models.UserInfo;
 import com.zpjj.musicapp.musicianmanagementapp.services.BandService;
+import com.zpjj.musicapp.musicianmanagementapp.services.FirebaseService;
 import com.zpjj.musicapp.musicianmanagementapp.services.NotifyService;
+import com.zpjj.musicapp.musicianmanagementapp.services.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +39,9 @@ public class JoinExistingBandFragment extends Fragment {
                 bands -> {
                     System.out.println(bands);
                     availableBands.addAll(bands);
+                },
+                err-> {
+                    ((BaseAuthActivity)getActivity()).logout();
                 }
         );
     }
@@ -60,9 +67,15 @@ public class JoinExistingBandFragment extends Fragment {
     private void onJoinBand() {
         BandService bandService = new BandService();
         bandService.createUserJoinBandRequest((Band) bandListSpinner.getSelectedItem(), ((BaseAuthActivity)getActivity()).mAuth.getCurrentUser());
-
-        NotifyService notifyService = new NotifyService();
-        notifyService.notifyBandMasterAboutJoinRequest((Band) bandListSpinner.getSelectedItem());
+        UserService us = new UserService();
+        us.getUserInfo(((Band) bandListSpinner.getSelectedItem()).getMasterUID()).subscribe(
+                info -> {
+                    ((BaseAuthActivity)getActivity()).getNotifyService().sendJoinRequestNotification(info.getFirebaseToken());
+                },
+                err -> {
+                    err.printStackTrace();
+                }
+        );
         Toast toast = Toast.makeText(getContext(), "Czekaj na akceptację Mastera zespołu", Toast.LENGTH_LONG);
         toast.show();
     }

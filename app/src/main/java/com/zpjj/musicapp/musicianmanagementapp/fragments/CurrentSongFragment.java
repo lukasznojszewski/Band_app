@@ -24,9 +24,8 @@ public class CurrentSongFragment extends Fragment {
     TextView authorTextView;
     TextView titleTextView;
     Timer t;
-    NotifyService notifyService;
     public CurrentSongFragment() {
-        notifyService = new NotifyService();
+
     }
 
     @Override

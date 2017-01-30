@@ -15,13 +15,15 @@
             android:text=""
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/curent_song_author" />
+            android:id="@+id/curent_song_author"
+            android:textSize="18sp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/current_song_not_set"
-            android:id="@+id/curent_song_title" />
+            android:id="@+id/curent_song_title"
+            android:textSize="24sp" />
     </LinearLayout>
 
 </FrameLayout>

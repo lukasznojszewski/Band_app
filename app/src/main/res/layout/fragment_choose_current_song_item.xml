@@ -7,11 +7,13 @@
         android:text="TextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/song_author_field" />
+        android:id="@+id/song_author_field"
+        android:textSize="18sp" />
 
     <TextView
         android:text="TextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/song_title_field" />
+        android:id="@+id/song_title_field"
+        android:textSize="24sp" />
 </LinearLayout>

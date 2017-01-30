@@ -1,11 +1,14 @@
 package com.zpjj.musicapp.musicianmanagementapp.services;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.util.Log;
 
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 import com.kelvinapps.rxfirebase.RxFirebaseDatabase;
+import com.zpjj.musicapp.musicianmanagementapp.R;
 import com.zpjj.musicapp.musicianmanagementapp.models.Song;
 
 import java.io.IOException;
@@ -25,20 +28,25 @@ import java.util.Scanner;
 
 public class NotifyService {
     private static final String TAG = "Notify Service";
-    private String serverKey = null;
-    private String senderId = null;
+    public String serverKey = null;
 
-    public NotifyService() {
+    public NotifyService(Context activity) {
         RxFirebaseDatabase.observeSingleValueEvent(FirebaseDatabase.getInstance().getReference("firebaseServer")).subscribe(
                 dataSnapshot -> {
-                    if (dataSnapshot.hasChild("id")) {
-                        senderId = dataSnapshot.child("id").getValue().toString();
-                    }
                     if (dataSnapshot.hasChild("key")) {
                         serverKey = dataSnapshot.child("key").getValue().toString();
+                        SharedPreferences sharedPref = activity.getSharedPreferences(
+                               activity.getString(R.string.key), Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString(activity.getString(R.string.key), serverKey);
+                        editor.commit();
                     }
                 }
         );
+    }
+
+    public NotifyService(String serverKey) {
+        this.serverKey = serverKey;
     }
 
     public void sendChangeSongNotification(String to, Song song) {

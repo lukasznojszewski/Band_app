@@ -30,4 +30,5 @@
     <string name="title">Tytuł</string>
     <string name="ic_choose_current_song">Wybierz piosenkę</string>
     <string name="current_song_not_set">Nie ustawiono bieżącej piosenki</string>
+    <string name="key">key</string>
 </resources>

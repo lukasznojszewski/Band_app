@@ -1,5 +1,7 @@
 package com.zpjj.musicapp.musicianmanagementapp.activities;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -29,6 +31,13 @@ public class MainActivity extends BaseAuthActivity {
                 setUserInfo(i);
             }
         }
+
+        SharedPreferences sharedPref = this.getSharedPreferences(
+                getString(R.string.key), Context.MODE_PRIVATE);
+        String key = sharedPref.getString(getString(R.string.key), "");
+        if(key != null && !key.equals("")) {
+            notifyService = new NotifyService(key);
+        }
         initNavigationMenu();
     }
 
@@ -51,7 +60,9 @@ public class MainActivity extends BaseAuthActivity {
             if(info == null) {
                 logout();
             } else {
-                notifyService = new NotifyService();
+                if(notifyService == null) {
+                    notifyService = new NotifyService(this);
+                }
                 setUserInfo(info);
                 if(info.getBands().size() == 0) {
                     navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(NavigationListener.CREATE_BAND));
@@ -84,6 +95,16 @@ public class MainActivity extends BaseAuthActivity {
         super.onSaveInstanceState(outState);
         outState.putSerializable("MainActivity#selectedBand", getSelectedBand());
         outState.putSerializable("MainActivity#userInfo", getUserInfo());
+
+        if(notifyService!= null && notifyService.serverKey != null) {
+            SharedPreferences sharedPref = this.getSharedPreferences(
+                    getString(R.string.key), Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(getString(R.string.key), notifyService.serverKey);
+            editor.commit();
+        }
+
+
 
     }
 

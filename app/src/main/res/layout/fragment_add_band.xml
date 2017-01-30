@@ -19,7 +19,7 @@
             android:hint="@string/band_name" />
 
         <Button
-            android:text="Button"
+            android:text="Dodaj"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/createBandButton" />

@@ -1,6 +1,6 @@
 # Band app
 
-## Działanie:
+## Działanie
 
 Aplikacja na androida dla zespołów muzycznych mająca na celu ułatwianie komunikacji wśród muzyków na scenie.
 
@@ -8,9 +8,9 @@ Aplikacja zawiera bazę wszystkich piosenek wykonywanych przez dany zespół. Je
 
 Dodatkową funkcją jest dodawanie notatek z informacjami przydatnymi dla poszczególnych muzyków. Każdy z nich może do danego utworu przypisać ważne dla niego informacje.
 
-## Autorzy:
+## Autorzy
 
-Daniel Karwowski
-Łukasz Nojszewski
+* Daniel Karwowski
+* Łukasz Nojszewski
 
 ### Wojskowa Akademia Techniczna

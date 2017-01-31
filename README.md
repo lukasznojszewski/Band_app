@@ -1,4 +1,4 @@
-# Band_app
+# Band App
 
 Aplikacja na androida dla zespołów muzycznych mająca na celu ułatwianie komunikacji wśród muzyków na scenie.
 

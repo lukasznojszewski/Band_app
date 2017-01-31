@@ -21,6 +21,26 @@ public class MainActivity extends BaseAuthActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        loadState(savedInstanceState);
+
+        loadFirebaseKeyAndInitNotifyService();
+        initNavigationMenu();
+        redirectToFragment();
+    }
+
+    private void loadFirebaseKeyAndInitNotifyService() {
+        SharedPreferences sharedPref = this.getSharedPreferences(
+                getString(R.string.key), Context.MODE_PRIVATE);
+        String key = sharedPref.getString(getString(R.string.key), "");
+        if(key != null && !key.equals("")) {
+            notifyService = new NotifyService(key);
+        }
+        if(mAuth.getCurrentUser() != null && notifyService == null) {
+            notifyService = new NotifyService(this);
+        }
+    }
+
+    private void loadState(Bundle savedInstanceState) {
         if(savedInstanceState != null) {
             if(savedInstanceState.getSerializable("MainActivity#selectedBand") != null) {
                 Band b = (Band) savedInstanceState.getSerializable("MainActivity#selectedBand");
@@ -31,14 +51,6 @@ public class MainActivity extends BaseAuthActivity {
                 setUserInfo(i);
             }
         }
-
-        SharedPreferences sharedPref = this.getSharedPreferences(
-                getString(R.string.key), Context.MODE_PRIVATE);
-        String key = sharedPref.getString(getString(R.string.key), "");
-        if(key != null && !key.equals("")) {
-            notifyService = new NotifyService(key);
-        }
-        initNavigationMenu();
     }
 
     private void initNavigationMenu() {
@@ -52,25 +64,32 @@ public class MainActivity extends BaseAuthActivity {
         setmDrawer(drawer);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        NavigationListener navigationListener = new NavigationListener(this);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationListener = new NavigationListener(this);
         navigationView.setNavigationItemSelectedListener(navigationListener);
+    }
+
+    private void redirectToFragment() {
         if(getUserInfo() == null || getSelectedBand() == null) {
             UserInfo info = (UserInfo) getIntent().getSerializableExtra("USER_INFO");
             if(info == null) {
                 logout();
             } else {
-                if(notifyService == null) {
-                    notifyService = new NotifyService(this);
-                }
                 setUserInfo(info);
                 if(info.getBands().size() == 0) {
                     navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(NavigationListener.CREATE_BAND));
                     navigationView.setCheckedItem(R.id.nav_create_band);
                 } else {
                     if(info.getBands().size() == 1) {
-                        navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(NavigationListener.CHOOSE_BAND));
-                        navigationView.setCheckedItem(R.id.nav_choose_band);
+                        mBandService.getBandById((String) info.getBands().keySet().toArray()[0]).subscribe(
+                                band -> {
+                                    setSelectedBand(band);
+                                    navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(NavigationListener.CURRENT_SONG));
+                                    navigationView.setCheckedItem(R.id.nav_current_song);
+                                }, err -> {
+                                    logout();
+                                }
+                        );
                     } else {
                         navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(NavigationListener.CHOOSE_BAND));
                         navigationView.setCheckedItem(R.id.nav_choose_band);
@@ -103,9 +122,6 @@ public class MainActivity extends BaseAuthActivity {
             editor.putString(getString(R.string.key), notifyService.serverKey);
             editor.commit();
         }
-
-
-
     }
 
 }

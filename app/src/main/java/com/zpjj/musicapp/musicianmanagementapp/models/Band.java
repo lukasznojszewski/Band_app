@@ -14,6 +14,7 @@ public class Band implements Serializable{
     private String id;
     private String name;
     private String masterUID;
+    private Song currentSong;
     private Map<String,Boolean> userJoinRequest = new HashMap<>();
     private Map<String, Boolean> users = new HashMap<>();
     private Map<String, Song> songs = new HashMap<>();
@@ -74,6 +75,14 @@ public class Band implements Serializable{
 
     public void setSongs(Map<String, Song> songs) {
         this.songs = songs;
+    }
+
+    public Song getCurrentSong() {
+        return currentSong;
+    }
+
+    public void setCurrentSong(Song currentSong) {
+        this.currentSong = currentSong;
     }
 
     @Override

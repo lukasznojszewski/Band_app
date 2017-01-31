@@ -1,6 +1,7 @@
 package com.zpjj.musicapp.musicianmanagementapp.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -37,10 +38,6 @@ public class ChooseBandFragment extends Fragment {
     Button chooseBandButton;
     List<Band> bandList = new ArrayList<>();
     BandListAdapter bandListAdapter;
-    public ChooseBandFragment() {
-
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,17 +56,26 @@ public class ChooseBandFragment extends Fragment {
         chooseBandButton.setOnClickListener(l-> {
             onChooseBand();
         });
-        BandService bandService = new BandService();
+        loadCurrentUserBandList();
+        return view;
+    }
+
+    /**
+     * Load list of bands for current User
+     */
+    private void loadCurrentUserBandList() {
+        BandService bandService = ((BaseAuthActivity) getActivity()).getmBandService();
+        UserService userService = ((BaseAuthActivity) getActivity()).getmUserService();
         Observable.create(
                 subscriber -> {
-                    UserService us = new UserService();
-                    us.getUserInfo(((BaseAuthActivity)getActivity()).getUserInfo().getId()).subscribe(info -> {
+                    userService.getUserInfo(((BaseAuthActivity)getActivity()).getUserInfo().getId()).subscribe(info -> {
                         ((BaseAuthActivity)getActivity()).setUserInfo(info);
-                        for (String bandId: ((BaseAuthActivity)getActivity()).getUserInfo().getBands().keySet()) {
+                        Integer userBandCount = info.getBands().keySet().size();
+                        for (String bandId: info.getBands().keySet()) {
                             bandService.getBandById(bandId).subscribe(
                                     band -> {
                                         subscriber.onNext(band);
-                                        if(((BaseAuthActivity)getActivity()).getUserInfo().getBands().keySet().size() == bandList.size()) {
+                                        if(userBandCount == bandList.size()) {
                                             subscriber.onCompleted();
                                         }
                                     },
@@ -96,50 +102,20 @@ public class ChooseBandFragment extends Fragment {
                     } else {
                         bandListSpinner.setSelection(0);
                     }
-
                 }
         );
-        return view;
     }
 
+    /**
+     * Set selected band and navigate to current song view
+     */
     private void onChooseBand() {
         if(bandListSpinner.getSelectedItem() != null) {
             ((BaseAuthActivity)getActivity()).setSelectedBand((Band) bandListSpinner.getSelectedItem());
-            updateMenuItemList();
-            NavigationListener listener = new NavigationListener((BaseAuthActivity) getActivity());
-            if(!listener.redirectOnNotify((BaseAuthActivity) getActivity())) {
-                navigateToCurrentSong();
-            }
-            updateAppTitleInMenu();
+            ((BaseAuthActivity) getActivity()).navigateToCurrentSong();
         } else {
-            Toast.makeText(getContext(), "Wybierz zespół",
+            Toast.makeText(getContext(), R.string.selectBand,
                     Toast.LENGTH_LONG).show();
         }
-
     }
-
-    private void updateMenuItemList() {
-        String currentUserId = ((BaseAuthActivity) getActivity()).mAuth.getCurrentUser().getUid();
-        String selectedBandMasterId = ((Band) bandListSpinner.getSelectedItem()).getMasterUID();
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        Menu menu = navigationView.getMenu();
-        if(currentUserId.equals(selectedBandMasterId)) {
-            menu.setGroupVisible(R.id.nav_master_band_items, true);
-        } else {
-            menu.setGroupVisible(R.id.nav_master_band_items, false);
-        }
-    }
-
-    private void navigateToCurrentSong() {
-        NavigationListener navigationListener = new NavigationListener((BaseAuthActivity)getActivity());
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(NavigationListener.CURRENT_SONG));
-        navigationView.setCheckedItem(R.id.nav_current_song);
-    }
-
-    private void updateAppTitleInMenu() {
-        TextView navAppName = (TextView) getActivity().findViewById(R.id.nav_app_title);
-        navAppName.setText("BandApp - " + ((Band) bandListSpinner.getSelectedItem()).getName());
-    }
-
 }

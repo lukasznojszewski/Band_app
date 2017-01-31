@@ -1,13 +1,20 @@
 package com.zpjj.musicapp.musicianmanagementapp.activities;
 
 import android.content.Intent;
+import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+import android.view.Menu;
+import android.widget.TextView;
 
+import com.zpjj.musicapp.musicianmanagementapp.R;
 import com.zpjj.musicapp.musicianmanagementapp.activities.auth.AuthActivity;
 import com.zpjj.musicapp.musicianmanagementapp.activities.auth.BaseActivity;
 import com.zpjj.musicapp.musicianmanagementapp.models.Band;
 import com.zpjj.musicapp.musicianmanagementapp.models.UserInfo;
+import com.zpjj.musicapp.musicianmanagementapp.navigation.NavigationListener;
+import com.zpjj.musicapp.musicianmanagementapp.services.BandService;
 import com.zpjj.musicapp.musicianmanagementapp.services.NotifyService;
+import com.zpjj.musicapp.musicianmanagementapp.services.UserService;
 
 import icepick.State;
 
@@ -17,13 +24,24 @@ import icepick.State;
 
 public class BaseAuthActivity extends BaseActivity {
 
-    Band selectedBand;
+    private Band selectedBand;
 
-    UserInfo userInfo;
+    private  UserInfo userInfo;
 
-    NotifyService notifyService;
+    protected NotifyService notifyService;
+    protected BandService mBandService;
+    protected UserService mUserService;
 
     private DrawerLayout mDrawer;
+
+    protected NavigationView navigationView;
+
+    protected NavigationListener navigationListener;
+
+    public BaseAuthActivity() {
+        mBandService = new BandService();
+        mUserService = new UserService();
+    }
 
     public Band getSelectedBand() {
         return selectedBand;
@@ -31,6 +49,8 @@ public class BaseAuthActivity extends BaseActivity {
 
     public void setSelectedBand(Band selectedBand) {
         this.selectedBand = selectedBand;
+        updateAppTitleName();
+        updateMenuItemList();
     }
 
     public UserInfo getUserInfo() {
@@ -52,6 +72,43 @@ public class BaseAuthActivity extends BaseActivity {
     public NotifyService getNotifyService() {
         return notifyService;
     }
+
+    public NavigationView getNavigationView() {
+        return navigationView;
+    }
+
+    public BandService getmBandService() {
+        return mBandService;
+    }
+
+    public UserService getmUserService() {
+        return mUserService;
+    }
+
+    public void setmBandService(BandService mBandService) {
+        this.mBandService = mBandService;
+    }
+
+    private void updateMenuItemList() {
+        String currentUserId = mAuth.getCurrentUser().getUid();
+        String selectedBandMasterId = getSelectedBand().getMasterUID();
+        Menu menu = navigationView.getMenu();
+        if(currentUserId.equals(selectedBandMasterId)) {
+            menu.setGroupVisible(R.id.nav_master_band_items, true);
+        } else {
+            menu.setGroupVisible(R.id.nav_master_band_items, false);
+        }
+    }
+    private void updateAppTitleName() {
+        TextView navAppName = (TextView) findViewById(R.id.nav_app_title);
+        navAppName.setText("BandApp - " + selectedBand.getName());
+    }
+
+    public void navigateToCurrentSong() {
+        navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(NavigationListener.CURRENT_SONG));
+        navigationView.setCheckedItem(R.id.nav_current_song);
+    }
+
 
     @Override
     protected void onResume() {

@@ -70,7 +70,7 @@ public class BandService {
      */
     public Observable<List<UserInfo>> getJoinRequestUsersToBand(String bandId) {
         return Observable.create(subscriber -> {
-            List<UserInfo> users = new ArrayList<UserInfo>();
+            List<UserInfo> users = new ArrayList<>();
             RxFirebaseDatabase.observeSingleValueEvent(mDatabase.getReference(bands).child(bandId),Band.class).subscribe(
                     band -> {
                         for (String userId : band.getUserJoinRequest().keySet()) {

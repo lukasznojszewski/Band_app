@@ -1,0 +1,10 @@
+com.zpjj.musicapp.musicianmanagementapp
+com.zpjj.musicapp.musicianmanagementapp.activities
+com.zpjj.musicapp.musicianmanagementapp.activities.auth
+com.zpjj.musicapp.musicianmanagementapp.adapters
+com.zpjj.musicapp.musicianmanagementapp.exceptions
+com.zpjj.musicapp.musicianmanagementapp.fragments
+com.zpjj.musicapp.musicianmanagementapp.models
+com.zpjj.musicapp.musicianmanagementapp.navigation
+com.zpjj.musicapp.musicianmanagementapp.services
+com.zpjj.musicapp.musicianmanagementapp.utils

@@ -14,11 +14,18 @@ import rx.Observable;
  */
 
 public class UserService {
+    public static final String users = "users";
+    public  static final String firebaseToken = "firebaseToken";
     FirebaseDatabase mDatabase;
     public UserService() {
         mDatabase = FirebaseDatabase.getInstance();
     }
 
+    /**
+     * load user information with firebase user object
+     * @param fbUser
+     * @return Observable user information object
+     */
     public Observable<UserInfo> getUserInfo(FirebaseUser fbUser) {
         if(fbUser == null) {
             return Observable.create(subscriber -> {
@@ -28,8 +35,13 @@ public class UserService {
         return getUserInfo(fbUser.getUid());
     }
 
+    /**
+     * load user information with user id
+     * @param userId user unique id
+     * @return Observable user info object
+     */
     public Observable<UserInfo> getUserInfo(String userId) {
-        return (Observable<UserInfo>) RxFirebaseDatabase.observeSingleValueEvent(mDatabase.getReference("users").child(userId),
+        return (Observable<UserInfo>) RxFirebaseDatabase.observeSingleValueEvent(mDatabase.getReference(users).child(userId),
                 dataSnapshot -> {
                     UserInfo info = new UserInfo();
                     info = dataSnapshot.getValue(UserInfo.class);
@@ -41,13 +53,18 @@ public class UserService {
             return Observable.error(new UserNotFoundException());
         }).onErrorResumeNext(throwable -> {
             System.out.println(throwable.getMessage());
-            return Observable.empty();
+            return Observable.error(throwable);
         });
 
     }
 
-    public void createOrUpdateUserInfo(FirebaseUser fbUser, UserInfo info) {
-        if(fbUser == null) {
+    /**
+     * create or update user information
+     * @param firebaseUser firebase authentication object
+     * @param info user information object
+     */
+    public void createOrUpdateUserInfo(FirebaseUser firebaseUser, UserInfo info) {
+        if(firebaseUser == null) {
             throw new NullPointerException();
         }
 
@@ -55,12 +72,16 @@ public class UserService {
             throw new NullPointerException();
         }
 
-        DatabaseReference myRef = mDatabase.getReference("users").child(fbUser.getUid());
+        DatabaseReference myRef = mDatabase.getReference(users).child(firebaseUser.getUid());
         myRef.setValue(info);
     }
 
-
+    /**
+     * update firebase notification device id
+     * @param currentUser signed in user object
+     * @param refreshedToken new firebase device token
+     */
     public void updateUserFirebaseId(FirebaseUser currentUser, String refreshedToken) {
-        mDatabase.getReference("users").child(currentUser.getUid()).child("firebaseToken").setValue(refreshedToken);
+        mDatabase.getReference(users).child(currentUser.getUid()).child(firebaseToken).setValue(refreshedToken);
     }
 }

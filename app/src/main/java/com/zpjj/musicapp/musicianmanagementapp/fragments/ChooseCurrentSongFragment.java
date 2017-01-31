@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -18,9 +17,6 @@ import com.zpjj.musicapp.musicianmanagementapp.R;
 import com.zpjj.musicapp.musicianmanagementapp.activities.BaseAuthActivity;
 import com.zpjj.musicapp.musicianmanagementapp.adapters.SongListAdapter;
 import com.zpjj.musicapp.musicianmanagementapp.models.Song;
-import com.zpjj.musicapp.musicianmanagementapp.models.UserInfo;
-import com.zpjj.musicapp.musicianmanagementapp.services.BandService;
-import com.zpjj.musicapp.musicianmanagementapp.services.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,18 +29,15 @@ public class ChooseCurrentSongFragment extends Fragment {
     List<Song> songs = new ArrayList<>();
     Button mAddSongButton;
     ListView listView;
-    BandService mBandService;
-    UserService mUserService;
     public ChooseCurrentSongFragment() {
-        mBandService = new BandService();
-        mUserService = new UserService();
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_choose_current_song, container, false);
-        refreshData();
+        loadBandSongs();
         listView = (ListView) view.findViewById(R.id.songlist);
         arrayAdapter = new SongListAdapter(getContext(),songs);
         listView.setAdapter(arrayAdapter);
@@ -58,31 +51,31 @@ public class ChooseCurrentSongFragment extends Fragment {
     }
 
     private AdapterView.OnItemClickListener onSongSelect() {
-        return new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                view.setSelected(true);
-                String currentBandId = ((BaseAuthActivity)getActivity()).getSelectedBand().getId();
-                mBandService.setCurrentSongForBand(currentBandId, songs.get(position));
-                Toast t = Toast.makeText(getContext(), "Wybrano nową piosenkę", Toast.LENGTH_LONG);
-                t.show();
-                for (String userId:
-                ((BaseAuthActivity)getActivity()).getSelectedBand().getUsers().keySet()) {
-                    mUserService.getUserInfo(userId).subscribe(info -> {
-                        ((BaseAuthActivity)getActivity()).getNotifyService().sendChangeSongNotification(info.getFirebaseToken(), songs.get(position));
+        return (parent, view, position, id) -> {
+            view.setSelected(true);
+            String currentBandId = ((BaseAuthActivity)getActivity()).getSelectedBand().getId();
+            ((BaseAuthActivity) getActivity()).getmBandService().setCurrentSongForBand(currentBandId, songs.get(position));
+            Toast t = Toast.makeText(getContext(), R.string.newSongWasSelected, Toast.LENGTH_LONG);
+            t.show();
+            for (String userId:
+            ((BaseAuthActivity)getActivity()).getSelectedBand().getUsers().keySet()) {
+                ((BaseAuthActivity) getActivity()).getmUserService().getUserInfo(userId).subscribe(info -> {
+                    ((BaseAuthActivity)getActivity()).getNotifyService().sendChangeSongNotification(info.getFirebaseToken(), songs.get(position));
 
-                    }, err-> {
-                                ((BaseAuthActivity)getActivity()).logout();
-                            });
-                }
+                }, err-> {
+                            ((BaseAuthActivity)getActivity()).logout();
+                        });
             }
         };
 
     }
 
+    /**
+     * show dialog for add song for band
+     */
     private void showAddSongDialog() {
         Dialog dialog = new Dialog(getContext());
-        dialog.setTitle("Dodaj piosenkę");
+        dialog.setTitle(getString(R.string.addSong));
         dialog.setContentView(R.layout.fragment_choose_current_song_add_song_dialog);
 
         EditText author = (EditText) dialog.findViewById(R.id.add_song_author_field);
@@ -101,24 +94,30 @@ public class ChooseCurrentSongFragment extends Fragment {
         dialog.show();
     }
 
+    /**
+     * add song for band
+     * @param author song author
+     * @param title song title
+     */
     private void addSong(String author, String title) {
         String currentBandId = ((BaseAuthActivity)getActivity()).getSelectedBand().getId();
         Song song = new Song.Builder()
                 .setAuthor(author)
                 .setTitle(title)
                 .build();
-        BandService bandService = new BandService();
-        bandService.addSongForBand(currentBandId, song);
-        refreshData();
+        ((BaseAuthActivity) getActivity()).getmBandService().addSongForBand(currentBandId, song);
+        loadBandSongs();
     }
 
-    public void refreshData() {
+    /**
+     * load band songs
+     */
+    public void loadBandSongs() {
         String currentBandId = ((BaseAuthActivity)getActivity()).getSelectedBand().getId();
-        BandService bandService = new BandService();
-        bandService.getBandById(currentBandId).subscribe(
+        ((BaseAuthActivity) getActivity()).getmBandService().getBandById(currentBandId).subscribe(
                 band -> {
                     ((BaseAuthActivity)getActivity()).setSelectedBand(band);
-                    songs = new ArrayList<Song>(band.getSongs().values());
+                    songs = new ArrayList<>(band.getSongs().values());
                     arrayAdapter = new SongListAdapter(getContext(), songs);
                     listView.setAdapter(arrayAdapter);
                 },
@@ -127,6 +126,4 @@ public class ChooseCurrentSongFragment extends Fragment {
                 }
         );
     }
-
-
 }

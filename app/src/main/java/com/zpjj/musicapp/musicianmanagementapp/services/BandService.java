@@ -19,17 +19,32 @@ import rx.Observable;
  */
 
 public class BandService {
+    public static final String bands = "bands";
+    public static final String songs = "songs";
+    public static final String currentSong = "currentSong";
+    public static final String userJontRequests = "userJoinRequest";
+
+
     FirebaseDatabase mDatabase;
     public BandService() {
         mDatabase = FirebaseDatabase.getInstance();
     }
 
-    public void addBand(Band band) {
-        mDatabase.getReference().child("bands").child(band.getId()).setValue(band);
+    /**
+     * create or update band
+     * @param band band object
+     */
+    public void createOrUpdateBand(Band band) {
+        mDatabase.getReference().child(bands).child(band.getId()).setValue(band);
     }
 
+    /**
+     * load band iformation with band id
+     * @param id band uuid
+     * @return Observable band information
+     */
     public Observable<Band> getBandById(String id) {
-        return (Observable<Band>) RxFirebaseDatabase.observeSingleValueEvent(mDatabase.getReference("bands").child(id),
+        return (Observable<Band>) RxFirebaseDatabase.observeSingleValueEvent(mDatabase.getReference(bands).child(id),
                 dataSnapshot -> {
                     Band band = new Band();
                     band = dataSnapshot.getValue(Band.class);
@@ -40,17 +55,26 @@ public class BandService {
         });
     }
 
+    /**
+     * load band list
+     * @return obserevable band list
+     */
     public Observable<List<Band>> getBands() {
-        return (Observable<List<Band>>) RxFirebaseDatabase.observeSingleValueEvent(mDatabase.getReference().child("bands"), DataSnapshotMapper.listOf(Band.class));
+        return (Observable<List<Band>>) RxFirebaseDatabase.observeSingleValueEvent(mDatabase.getReference().child(bands), DataSnapshotMapper.listOf(Band.class));
     }
 
+    /**
+     * load user join request to nabd
+     * @param bandId band uuid
+     * @return Observable list of user
+     */
     public Observable<List<UserInfo>> getJoinRequestUsersToBand(String bandId) {
         return Observable.create(subscriber -> {
             List<UserInfo> users = new ArrayList<UserInfo>();
-            RxFirebaseDatabase.observeSingleValueEvent(mDatabase.getReference("bands").child(bandId),Band.class).subscribe(
+            RxFirebaseDatabase.observeSingleValueEvent(mDatabase.getReference(bands).child(bandId),Band.class).subscribe(
                     band -> {
                         for (String userId : band.getUserJoinRequest().keySet()) {
-                            RxFirebaseDatabase.observeSingleValueEvent(mDatabase.getReference("users").child(userId), UserInfo.class).subscribe(
+                            RxFirebaseDatabase.observeSingleValueEvent(mDatabase.getReference(UserService.users).child(userId), UserInfo.class).subscribe(
                                     userInfo -> {
                                         users.add(userInfo);
                                         if(band.getUserJoinRequest().size() == users.size()) {
@@ -68,29 +92,59 @@ public class BandService {
         });
     }
 
+    /**
+     * load current song for band
+     * @param bandId band uuid
+     * @return observale of current song
+     */
     public Observable<Song> getCurrentSongForBand(String bandId) {
-        return RxFirebaseDatabase.observeSingleValueEvent(mDatabase.getReference("bands").child(bandId).child("currentSong"), Song.class);
+        return RxFirebaseDatabase.observeSingleValueEvent(mDatabase.getReference(bands).child(bandId).child(currentSong), Song.class);
     }
 
+    /**
+     * create user join request to band
+     * @param band
+     * @param currentUser
+     */
     public void createUserJoinBandRequest(Band band, FirebaseUser currentUser) {
-        mDatabase.getReference("bands").child(band.getId()).child("userJoinRequest").child(currentUser.getUid()).setValue(true);
+        mDatabase.getReference(bands).child(band.getId()).child(userJontRequests).child(currentUser.getUid()).setValue(true);
     }
 
+    /**
+     * accept user join request to band
+     * @param band
+     * @param userId
+     */
     public void acceptUserJoinRequest(Band band, String userId) {
-        mDatabase.getReference("bands").child(band.getId()).child("userJoinRequest").child(userId).removeValue();
-        mDatabase.getReference("bands").child(band.getId()).child("users").child(userId).setValue(true);
-        mDatabase.getReference("users").child(userId).child("bands").child(band.getId()).setValue(true);
+        mDatabase.getReference(bands).child(band.getId()).child(userJontRequests).child(userId).removeValue();
+        mDatabase.getReference(bands).child(band.getId()).child(UserService.users).child(userId).setValue(true);
+        mDatabase.getReference(UserService.users).child(userId).child(bands).child(band.getId()).setValue(true);
     }
 
+    /**
+     * rejest user join request to band
+     * @param band
+     * @param userId
+     */
     public void rejectUserJoindRequest(Band band, String userId) {
-        mDatabase.getReference("bands").child(band.getId()).child("userJoinRequest").child(userId).removeValue();
+        mDatabase.getReference(bands).child(band.getId()).child(userJontRequests).child(userId).removeValue();
     }
 
-    public void addSongForBand(String currentBandId, Song song) {
-        mDatabase.getReference("bands").child(currentBandId).child("songs").child(song.getId()).setValue(song);
+    /**
+     * add song for band
+     * @param bandId
+     * @param song
+     */
+    public void addSongForBand(String bandId, Song song) {
+        mDatabase.getReference(bands).child(bandId).child(songs).child(song.getId()).setValue(song);
     }
 
-    public void setCurrentSongForBand(String currentBandId, Song song) {
-        mDatabase.getReference("bands").child(currentBandId).child("currentSong").setValue(song);
+    /**
+     * update current song for band
+     * @param bandId
+     * @param song
+     */
+    public void setCurrentSongForBand(String bandId, Song song) {
+        mDatabase.getReference(bands).child(bandId).child(currentSong).setValue(song);
     }
 }

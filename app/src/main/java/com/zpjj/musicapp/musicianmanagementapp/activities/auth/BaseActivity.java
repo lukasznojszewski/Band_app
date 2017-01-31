@@ -2,9 +2,7 @@ package com.zpjj.musicapp.musicianmanagementapp.activities.auth;
 
 import android.app.ProgressDialog;
 import android.support.annotation.VisibleForTesting;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.zpjj.musicapp.musicianmanagementapp.R;
@@ -15,8 +13,6 @@ import com.zpjj.musicapp.musicianmanagementapp.R;
 
 public class BaseActivity extends AppCompatActivity {
     public FirebaseAuth mAuth;
-    private DrawerLayout mDrawer;
-    private Toolbar toolbar;
 
     @VisibleForTesting
     public ProgressDialog mProgressDialog;

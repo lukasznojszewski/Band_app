@@ -85,10 +85,6 @@ public class BaseAuthActivity extends BaseActivity {
         return mUserService;
     }
 
-    public void setmBandService(BandService mBandService) {
-        this.mBandService = mBandService;
-    }
-
     private void updateMenuItemList() {
         String currentUserId = mAuth.getCurrentUser().getUid();
         String selectedBandMasterId = getSelectedBand().getMasterUID();
@@ -107,6 +103,16 @@ public class BaseAuthActivity extends BaseActivity {
     public void navigateToCurrentSong() {
         navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(NavigationListener.CURRENT_SONG));
         navigationView.setCheckedItem(R.id.nav_current_song);
+    }
+
+    public void navigateToChooseBand() {
+        navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(NavigationListener.CHOOSE_BAND));
+        navigationView.setCheckedItem(R.id.nav_choose_band);
+    }
+
+    public void navigateToCreateBand() {
+        navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(NavigationListener.CREATE_BAND));
+        navigationView.setCheckedItem(R.id.nav_create_band);
     }
 
 

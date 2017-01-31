@@ -1,8 +1,6 @@
 package com.zpjj.musicapp.musicianmanagementapp.fragments;
 
 import android.app.Dialog;
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -18,12 +16,8 @@ import com.zpjj.musicapp.musicianmanagementapp.R;
 import com.zpjj.musicapp.musicianmanagementapp.activities.BaseAuthActivity;
 import com.zpjj.musicapp.musicianmanagementapp.models.Band;
 import com.zpjj.musicapp.musicianmanagementapp.models.UserInfo;
-import com.zpjj.musicapp.musicianmanagementapp.services.BandService;
-import com.zpjj.musicapp.musicianmanagementapp.services.NotifyService;
-import com.zpjj.musicapp.musicianmanagementapp.services.UserService;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,7 +26,6 @@ import java.util.Arrays;
 public class AcceptJoinBandFragment extends Fragment {
     private ArrayList<UserInfo> arrayList;
     private ArrayAdapter<UserInfo> arrayAdapter;
-    private BandService mBandService;
     public AcceptJoinBandFragment() {
     }
 
@@ -48,8 +41,8 @@ public class AcceptJoinBandFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_accpet_join_band, container, false);
         ListView listView=(ListView)view.findViewById(R.id.listv);
         arrayAdapter= new ArrayAdapter<UserInfo>(getContext(), R.layout.fragment_accept_join_band_item, R.id.txtitem,arrayList);
-        mBandService = new BandService();
-        mBandService.getJoinRequestUsersToBand(((BaseAuthActivity)getActivity()).getSelectedBand().getId()).subscribe(
+
+        ((BaseAuthActivity)getActivity()).getmBandService().getJoinRequestUsersToBand(((BaseAuthActivity)getActivity()).getSelectedBand().getId()).subscribe(
                 userInfos -> {
                     arrayList.addAll(userInfos);
                     arrayAdapter.notifyDataSetChanged();
@@ -62,30 +55,35 @@ public class AcceptJoinBandFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                showDescisionDialog(arrayList.get(position));
+                showDecisionDialog(arrayList.get(position));
             }
         });
         return view;
     }
 
-    private void showDescisionDialog(UserInfo info) {
+    /**
+     * show decision dialog for selected user from join request list
+     * you can accept or reject join request
+     * @param userInfo selected user information object
+     */
+    private void showDecisionDialog(UserInfo userInfo) {
         Band currentBand = ((BaseAuthActivity)getActivity()).getSelectedBand();
         final Dialog dialog = new Dialog(getContext());
         dialog.setTitle(R.string.confirm_join_band);
         dialog.setContentView(R.layout.fragment_accept_join_band_dialog);
         TextView textView = (TextView) dialog.findViewById(R.id.join_user_title);
-        textView.setText(info.getEmail());
+        textView.setText(userInfo.getEmail());
 
         Button reject = (Button) dialog.findViewById(R.id.reject_join_band_button);
         reject.setOnClickListener(l-> {
-            mBandService.rejectUserJoindRequest(currentBand, info.getId());
-            ((BaseAuthActivity)getActivity()).getNotifyService().sendRejectJoinBandNotification(info.getFirebaseToken());
+            ((BaseAuthActivity)getActivity()).getmBandService().rejectUserJoindRequest(currentBand, userInfo.getId());
+            ((BaseAuthActivity)getActivity()).getNotifyService().sendRejectJoinBandNotification(userInfo.getFirebaseToken());
             dialog.dismiss();
         });
         Button accept = (Button) dialog.findViewById(R.id.accept_join_band_button);
         accept.setOnClickListener(l-> {
-            mBandService.acceptUserJoinRequest(currentBand, info.getId());
-            ((BaseAuthActivity)getActivity()).getNotifyService().sendAcceptJoinBandNotification(info.getFirebaseToken());
+            ((BaseAuthActivity)getActivity()).getmBandService().acceptUserJoinRequest(currentBand, userInfo.getId());
+            ((BaseAuthActivity)getActivity()).getNotifyService().sendAcceptJoinBandNotification(userInfo.getFirebaseToken());
             dialog.dismiss();
         });
         dialog.show();

@@ -26,14 +26,12 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.zpjj.musicapp.musicianmanagementapp.R;
-import com.zpjj.musicapp.musicianmanagementapp.activities.auth.BaseActivity;
 import com.zpjj.musicapp.musicianmanagementapp.activities.MainActivity;
 import com.zpjj.musicapp.musicianmanagementapp.activities.auth.AuthActivity;
+import com.zpjj.musicapp.musicianmanagementapp.activities.auth.BaseActivity;
 import com.zpjj.musicapp.musicianmanagementapp.exceptions.UserNotFoundException;
 import com.zpjj.musicapp.musicianmanagementapp.models.UserInfo;
-import com.zpjj.musicapp.musicianmanagementapp.services.NotifyService;
 import com.zpjj.musicapp.musicianmanagementapp.services.UserService;
 
 public class SignInTabFragment extends Fragment implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
@@ -44,8 +42,9 @@ public class SignInTabFragment extends Fragment implements View.OnClickListener,
     EditText passwordField;
     SignInButton googleSignInButton;
     GoogleApiClient mGoogleApiClient;
-
+    UserService userService;
     public SignInTabFragment() {
+        userService = new UserService();
     }
 
 
@@ -94,51 +93,13 @@ public class SignInTabFragment extends Fragment implements View.OnClickListener,
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
 
-                        context.hideProgressDialog();
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithCredential", task.getException());
                             Toast.makeText(context, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             Log.d(TAG, task.getResult().getUser().getUid());
-                            UserService userService = new UserService();
-                            userService.getUserInfo(task.getResult().getUser()).subscribe(
-                                    data -> {
-                                        String token = FirebaseInstanceId.getInstance().getToken();
-                                        Log.d("TOKEN",token);
-                                        userService.updateUserFirebaseId(task.getResult().getUser(), token);
-                                        data.setFirebaseToken(token);
-
-                                        if(data.getId() == null || data.getId().equals("")) {
-                                            data.setId(task.getResult().getUser().getUid());
-                                            userService.createOrUpdateUserInfo(task.getResult().getUser(), data);
-                                        }
-                                        Intent i = new Intent(context, MainActivity.class);
-                                        i.putExtra("USER_INFO", data);
-                                        String notifyType = getActivity().getIntent().getStringExtra("NOTIFY_TYPE");
-                                        if(notifyType != null && !notifyType.equals("")) {
-                                            i.putExtra("NOTIFY_TYPE", notifyType);
-                                        }
-                                        context.startActivity(i);
-                                    }, err -> {
-                                        if(err instanceof UserNotFoundException) {
-                                            UserInfo info = new UserInfo();
-                                            info.setId(task.getResult().getUser().getUid());
-                                            info.setEmail(task.getResult().getUser().getEmail());
-                                            String token = FirebaseInstanceId.getInstance().getToken();
-                                            Log.d("TOKEN",token);
-                                            info.setFirebaseToken(token);
-                                            userService.createOrUpdateUserInfo(task.getResult().getUser(), info);
-                                            Intent i = new Intent(context, MainActivity.class);
-                                            i.putExtra("USER_INFO", info);
-                                            String notifyType = getActivity().getIntent().getStringExtra("NOTIFY_TYPE");
-                                            if(notifyType != null && !notifyType.equals("")) {
-                                                i.putExtra("NOTIFY_TYPE", notifyType);
-                                            }
-                                            context.startActivity(i);
-                                        }
-                                    }
-                            );
+                            onLoginSuccess(task, context);
 
                         }
                     }
@@ -146,7 +107,52 @@ public class SignInTabFragment extends Fragment implements View.OnClickListener,
 
     }
 
+    private void onLoginSuccess(@NonNull Task<AuthResult> task, AuthActivity context) {
+        userService.getUserInfo(task.getResult().getUser()).subscribe(
+                data -> {
+                    String token = FirebaseInstanceId.getInstance().getToken();
+                    Log.d("TOKEN",token);
+                    userService.updateUserFirebaseId(task.getResult().getUser(), token);
+                    data.setFirebaseToken(token);
 
+                    if(data.getId() == null || data.getId().equals("")) {
+                        data.setId(task.getResult().getUser().getUid());
+                        userService.createOrUpdateUserInfo(task.getResult().getUser(), data);
+                    }
+                    Intent i = new Intent(context, MainActivity.class);
+                    i.putExtra("USER_INFO", data);
+                    String notifyType = getActivity().getIntent().getStringExtra("NOTIFY_TYPE");
+                    if(notifyType != null && !notifyType.equals("")) {
+                        i.putExtra("NOTIFY_TYPE", notifyType);
+                    }
+                    context.hideProgressDialog();
+                    context.startActivity(i);
+                }, err -> {
+                    if(err instanceof UserNotFoundException) {
+                        UserInfo info = new UserInfo();
+                        info.setId(task.getResult().getUser().getUid());
+                        info.setEmail(task.getResult().getUser().getEmail());
+                        String token = FirebaseInstanceId.getInstance().getToken();
+                        Log.d("TOKEN",token);
+                        info.setFirebaseToken(token);
+                        userService.createOrUpdateUserInfo(task.getResult().getUser(), info);
+                        Intent i = new Intent(context, MainActivity.class);
+                        i.putExtra("USER_INFO", info);
+                        String notifyType = getActivity().getIntent().getStringExtra("NOTIFY_TYPE");
+                        if(notifyType != null && !notifyType.equals("")) {
+                            i.putExtra("NOTIFY_TYPE", notifyType);
+                        }
+                        context.hideProgressDialog();
+                        context.startActivity(i);
+                    }
+                }
+        );
+    }
+
+    /**
+     * validate user form
+     * @return true if form is valid and false when invalid
+     */
     private boolean validateForm() {
         boolean valid = true;
 
@@ -219,51 +225,12 @@ public class SignInTabFragment extends Fragment implements View.OnClickListener,
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
-                        context.hideProgressDialog();
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithCredential", task.getException());
                             Toast.makeText(context, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            UserService userService = new UserService();
-                            userService.getUserInfo(task.getResult().getUser()).subscribe(
-                                        data -> {
-                                            String token = FirebaseInstanceId.getInstance().getToken();
-                                            userService.updateUserFirebaseId(task.getResult().getUser(), token);
-                                            data.setFirebaseToken(token);
-
-                                            if(data.getId() == null || data.getId().equals("")) {
-                                                data.setId(task.getResult().getUser().getUid());
-                                                userService.createOrUpdateUserInfo(task.getResult().getUser(), data);
-                                            }
-                                            Intent i = new Intent(context, MainActivity.class);
-                                            i.putExtra("USER_INFO", data);
-                                            String notifyType = getActivity().getIntent().getStringExtra("NOTIFY_TYPE");
-                                            if(notifyType != null && !notifyType.equals("")) {
-                                                i.putExtra("NOTIFY_TYPE", notifyType);
-                                            }
-                                            context.startActivity(i);
-
-                                        }, err -> {
-                                            if(err instanceof UserNotFoundException) {
-                                                UserInfo info = new UserInfo();
-                                                info.setId(task.getResult().getUser().getUid());
-                                                info.setEmail(task.getResult().getUser().getEmail());
-                                                String token = FirebaseInstanceId.getInstance().getToken();
-                                                Log.d("TOKEN",token);
-                                                info.setFirebaseToken(token);
-                                                userService.createOrUpdateUserInfo(task.getResult().getUser(), info);
-                                                Intent i = new Intent(context, MainActivity.class);
-                                                i.putExtra("USER_INFO", info);
-                                                String notifyType = getActivity().getIntent().getStringExtra("NOTIFY_TYPE");
-                                                if(notifyType != null && !notifyType.equals("")) {
-                                                    i.putExtra("NOTIFY_TYPE", notifyType);
-                                                }
-                                                context.startActivity(i);
-                                            }
-                                        }
-                                );
-
+                           onLoginSuccess(task, context);
                         }
                     }
                 });

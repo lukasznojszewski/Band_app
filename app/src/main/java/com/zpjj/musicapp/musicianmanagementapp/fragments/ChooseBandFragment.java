@@ -1,29 +1,18 @@
 package com.zpjj.musicapp.musicianmanagementapp.fragments;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.database.FirebaseDatabase;
 import com.zpjj.musicapp.musicianmanagementapp.R;
 import com.zpjj.musicapp.musicianmanagementapp.activities.BaseAuthActivity;
-import com.zpjj.musicapp.musicianmanagementapp.activities.auth.BaseActivity;
 import com.zpjj.musicapp.musicianmanagementapp.adapters.BandListAdapter;
 import com.zpjj.musicapp.musicianmanagementapp.models.Band;
-import com.zpjj.musicapp.musicianmanagementapp.navigation.NavigationListener;
 import com.zpjj.musicapp.musicianmanagementapp.services.BandService;
 import com.zpjj.musicapp.musicianmanagementapp.services.UserService;
 

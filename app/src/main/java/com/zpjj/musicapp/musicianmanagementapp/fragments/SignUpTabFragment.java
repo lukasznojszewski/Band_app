@@ -83,6 +83,11 @@ public class SignUpTabFragment extends Fragment {
             }
         });
     }
+
+    /**
+     * validate sign up form
+     * @return true if form is valid and false when invalid
+     */
     private boolean validateForm() {
         boolean valid = true;
 

@@ -49,6 +49,11 @@ public class NotifyService {
         this.serverKey = serverKey;
     }
 
+    /**
+     * send notification on change current song
+     * @param to firebase user device id
+     * @param song song
+     */
     public void sendChangeSongNotification(String to, Song song) {
         Notification n = new Notification(song.getAuthor() + " - " + song.getTitle(), "Zmiana piosenki");
         try {
@@ -58,6 +63,10 @@ public class NotifyService {
         }
     }
 
+    /**
+     * send notification on accept user join to band
+     * @param to firebase user device id
+     */
     public void sendAcceptJoinBandNotification(String to) {
         Notification n = new Notification("Zakceptowano prośbę dołączenia do zespołu", "Band App");
         try {
@@ -66,7 +75,10 @@ public class NotifyService {
             e.printStackTrace();
         }
     }
-
+    /**
+     * send notification on reject user join to band
+     * @param to firebase user device id
+     */
     public void sendRejectJoinBandNotification(String to) {
         Notification n = new Notification("Odrzucono prośbę dołączenia do zespołu", "Band App");
         try {
@@ -76,6 +88,10 @@ public class NotifyService {
         }
     }
 
+    /**
+     * send notification on join request to band
+     * @param to firebase user device id
+     */
     public void sendJoinRequestNotification(String to) {
         Notification n = new Notification("Nowa prośba o dołączenie do zespołu", "Band App");
         try {
@@ -85,15 +101,13 @@ public class NotifyService {
         }
     }
 
-    public void sendTestNotification() {
-        Notification n = new Notification("Title", "Body");
-        try {
-            sendNotification(n, "fvTOrBNf7q0:APA91bEsXPWXCygNVQYlZGQn2y-EVBxaVozNLy4HR-w15TzVGCmaBj7KLvcSKLPbQURR7KpRGfkPvkGiAq3_7NLNR0ldH3zneSFJBKWxx68Ek5ZQ24GJ84qshB2EX4GRTfvhKe89unZX", FirebaseService.ENotifyType.JOIN_BAND_REQUEST);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
+    /**
+     * send notification to firebase user device id
+     * @param message notification title and body object
+     * @param to firebase user device id
+     * @param type type of message
+     * @throws IOException
+     */
     private void sendNotification(Notification message, String to, FirebaseService.ENotifyType type) throws IOException {
         LoadingThread thread = new LoadingThread(message, to, serverKey, type);
         thread.start();

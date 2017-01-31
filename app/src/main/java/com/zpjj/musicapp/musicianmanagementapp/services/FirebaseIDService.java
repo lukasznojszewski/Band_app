@@ -14,6 +14,9 @@ import com.google.firebase.iid.FirebaseInstanceIdService;
 public class FirebaseIDService extends FirebaseInstanceIdService {
     private static final String TAG = "FirebaseIDService";
 
+    /**
+     * update firebase user device id on token change
+     */
     @Override
     public void onTokenRefresh() {
         // Get updated InstanceID token.

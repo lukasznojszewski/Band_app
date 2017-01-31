@@ -28,6 +28,9 @@ public class MainActivity extends BaseAuthActivity {
         redirectToFragment();
     }
 
+    /**
+     * initialize firebase notification service
+     */
     private void loadFirebaseKeyAndInitNotifyService() {
         SharedPreferences sharedPref = this.getSharedPreferences(
                 getString(R.string.key), Context.MODE_PRIVATE);
@@ -40,19 +43,26 @@ public class MainActivity extends BaseAuthActivity {
         }
     }
 
+    /**
+     * load state if phone was rotated
+     * @param savedInstanceState
+     */
     private void loadState(Bundle savedInstanceState) {
         if(savedInstanceState != null) {
-            if(savedInstanceState.getSerializable("MainActivity#selectedBand") != null) {
-                Band b = (Band) savedInstanceState.getSerializable("MainActivity#selectedBand");
+            if(savedInstanceState.getSerializable(getString(R.string.BUNDLE_MAIN_ACTIVITY_SELECTED_BAND)) != null) {
+                Band b = (Band) savedInstanceState.getSerializable(getString(R.string.BUNDLE_MAIN_ACTIVITY_SELECTED_BAND));
                 setSelectedBand(b);
             }
-            if(savedInstanceState.getSerializable("MainActivity#userInfo") != null) {
-                UserInfo i = (UserInfo) savedInstanceState.getSerializable("MainActivity#userInfo");
+            if(savedInstanceState.getSerializable(getString(R.string.BUNDLE_MAIN_ACTIVITY_USER_INFO)) != null) {
+                UserInfo i = (UserInfo) savedInstanceState.getSerializable(getString(R.string.BUNDLE_MAIN_ACTIVITY_USER_INFO));
                 setUserInfo(i);
             }
         }
     }
 
+    /**
+     * initialize left menu
+     */
     private void initNavigationMenu() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -69,36 +79,39 @@ public class MainActivity extends BaseAuthActivity {
         navigationView.setNavigationItemSelectedListener(navigationListener);
     }
 
+    /**
+     * set init view
+     */
     private void redirectToFragment() {
         if(getUserInfo() == null || getSelectedBand() == null) {
-            UserInfo info = (UserInfo) getIntent().getSerializableExtra("USER_INFO");
+            UserInfo info = (UserInfo) getIntent().getSerializableExtra(getString(R.string.INTENT_LOGED_IN_USER_INFO));
             if(info == null) {
                 logout();
             } else {
                 setUserInfo(info);
                 if(info.getBands().size() == 0) {
-                    navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(NavigationListener.CREATE_BAND));
-                    navigationView.setCheckedItem(R.id.nav_create_band);
+                    navigateToCreateBand();
                 } else {
                     if(info.getBands().size() == 1) {
                         mBandService.getBandById((String) info.getBands().keySet().toArray()[0]).subscribe(
                                 band -> {
                                     setSelectedBand(band);
-                                    navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(NavigationListener.CURRENT_SONG));
-                                    navigationView.setCheckedItem(R.id.nav_current_song);
+                                    navigateToCurrentSong();
                                 }, err -> {
                                     logout();
                                 }
                         );
                     } else {
-                        navigationListener.onNavigationItemSelected(navigationView.getMenu().getItem(NavigationListener.CHOOSE_BAND));
-                        navigationView.setCheckedItem(R.id.nav_choose_band);
+                        navigateToChooseBand();
                     }
                 }
             }
         }
     }
 
+    /**
+     * on back button click event listener
+     */
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -109,11 +122,15 @@ public class MainActivity extends BaseAuthActivity {
         }
     }
 
+    /**
+     * save state before rotate view
+     * @param outState
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable("MainActivity#selectedBand", getSelectedBand());
-        outState.putSerializable("MainActivity#userInfo", getUserInfo());
+        outState.putSerializable(getString(R.string.BUNDLE_MAIN_ACTIVITY_SELECTED_BAND), getSelectedBand());
+        outState.putSerializable(getString(R.string.BUNDLE_MAIN_ACTIVITY_USER_INFO), getUserInfo());
 
         if(notifyService!= null && notifyService.serverKey != null) {
             SharedPreferences sharedPref = this.getSharedPreferences(

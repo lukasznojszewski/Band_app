@@ -48,10 +48,12 @@ public class NavigationListener implements NavigationView.OnNavigationItemSelect
         switch (item.getItemId()) {
             case R.id.nav_band_join_request:
                 changeFragment(authActivity, AcceptJoinBandFragment.class, R.id.content_main);
+                authActivity.getNavigationView().setCheckedItem(R.id.nav_band_join_request);
                 authActivity.setTitle(item.getTitle());
                 break;
             case R.id.nav_choose_current_song:
                 changeFragment(authActivity, ChooseCurrentSongFragment.class, R.id.content_main);
+                authActivity.getNavigationView().setCheckedItem(R.id.nav_choose_current_song);
                 authActivity.setTitle(item.getTitle());
                 break;
             case R.id.nav_current_song:
@@ -94,23 +96,5 @@ public class NavigationListener implements NavigationView.OnNavigationItemSelect
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(overrideFragmentId, fragment).commit();
         activity.getmDrawer().closeDrawers();
-    }
-
-    public void navigateToAcceptJoinBand(BaseAuthActivity activity) {
-        changeFragment(activity, AcceptJoinBandFragment.class, R.id.content_main);
-        NavigationView navigationView = (NavigationView) activity.findViewById(R.id.nav_view);
-        navigationView.setCheckedItem(R.id.nav_band_join_request);
-    }
-
-    public boolean redirectOnNotify(BaseAuthActivity authActivity) {
-        String notifyType = authActivity.getIntent().getStringExtra("NOTIFY_TYPE");
-        if(notifyType != null && !notifyType.equals("")) {
-            Log.d("TYPE", notifyType);
-            if(notifyType.equals("JOIN_BAND_REQUEST")) {
-                navigateToAcceptJoinBand(authActivity);
-                return true;
-            }
-        }
-        return false;
     }
 }

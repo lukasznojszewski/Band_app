@@ -1,26 +1,19 @@
 package com.zpjj.musicapp.musicianmanagementapp.fragments;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.zpjj.musicapp.musicianmanagementapp.R;
 import com.zpjj.musicapp.musicianmanagementapp.activities.BaseAuthActivity;
-import com.zpjj.musicapp.musicianmanagementapp.activities.auth.BaseActivity;
-import com.zpjj.musicapp.musicianmanagementapp.services.BandService;
-import com.zpjj.musicapp.musicianmanagementapp.services.NotifyService;
 
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class CurrentSongFragment extends Fragment {
-    BandService mBandService;
     TextView authorTextView;
     TextView titleTextView;
     Timer t;
@@ -39,7 +32,6 @@ public class CurrentSongFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_current_song, container, false);
         authorTextView = (TextView) view.findViewById(R.id.curent_song_author);
         titleTextView = (TextView) view.findViewById(R.id.curent_song_title);
-        mBandService = new BandService();
         t = new Timer();
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -52,10 +44,13 @@ public class CurrentSongFragment extends Fragment {
         return view;
     }
 
+    /**
+     * refresh current song
+     */
     private void refreshCurrentSong() {
         if(((BaseAuthActivity)getActivity()).getSelectedBand() != null) {
             String currentBandId = ((BaseAuthActivity)getActivity()).getSelectedBand().getId();
-            mBandService.getCurrentSongForBand(currentBandId).subscribe(song -> {
+            ((BaseAuthActivity) getActivity()).getmBandService().getCurrentSongForBand(currentBandId).subscribe(song -> {
                 if(song!= null) {
                     authorTextView.setText(song.getAuthor());
                     titleTextView.setText(song.getTitle());

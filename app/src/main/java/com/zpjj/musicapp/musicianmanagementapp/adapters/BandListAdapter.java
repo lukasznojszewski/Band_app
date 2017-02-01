@@ -30,14 +30,5 @@ public class BandListAdapter extends ArrayAdapter<Band> {
         notifyDataSetChanged();
         return label;
     }
-
-    @Override
-    public View getDropDownView(int position, View convertView,
-                                ViewGroup parent) {
-        TextView label = new TextView(getContext());
-        label.setText(values.get(position).getName());
-
-        return label;
-    }
     
 }

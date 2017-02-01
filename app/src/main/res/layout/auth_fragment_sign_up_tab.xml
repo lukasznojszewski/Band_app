@@ -18,7 +18,9 @@
             android:layout_marginBottom="8dp"
             android:layout_marginTop="8dp"
             android:hint="Email"
-            android:text="master@music.pl" />
+            android:text="master@music.pl"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
 
         <EditText
             android:layout_width="match_parent"
@@ -28,7 +30,9 @@
             android:id="@+id/passwordField"
             android:hint="Hasło"
             android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
 
         <EditText
             android:layout_width="match_parent"
@@ -38,7 +42,9 @@
             android:id="@+id/repeatPasswordField"
             android:hint="Powtórz Hasło"
             android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
 
         <Button
             android:text="Zarejestruj"
@@ -46,7 +52,9 @@
             android:layout_height="wrap_content"
             android:id="@+id/signUpBtn"
             android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
     </LinearLayout>
 
 </FrameLayout>

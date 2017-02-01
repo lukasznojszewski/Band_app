@@ -7,7 +7,8 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:weightSum="1">
 
         <EditText
             android:layout_width="match_parent"
@@ -18,7 +19,10 @@
             android:layout_marginBottom="8dp"
             android:layout_marginTop="8dp"
             android:hint="Email"
-            android:text="master@music.pl" />
+            android:text="master@music.pl"
+            android:singleLine="false"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
 
         <EditText
             android:layout_width="match_parent"
@@ -28,7 +32,9 @@
             android:id="@+id/passwordField"
             android:hint="Hasło"
             android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
 
         <Button
             android:text="Zaloguj"
@@ -36,11 +42,15 @@
             android:layout_height="wrap_content"
             android:id="@+id/sign_in"
             android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
         <com.google.android.gms.common.SignInButton
             android:id="@+id/google_sign_in_button"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="7dp"
+            android:layout_marginRight="7dp" />
     </LinearLayout>
 
 </FrameLayout>

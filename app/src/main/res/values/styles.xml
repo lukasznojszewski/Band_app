@@ -6,6 +6,12 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorControlActivated">@color/colorControlActive</item>
+        <item name="colorControlHighlight">@color/colorControlActive</item>
+        <item name="colorControlNormal">@color/colorControlNormal</item>
+        <item name="android:colorBackground">@color/background</item>
+        <item name="android:buttonStyle">@style/buttonStyle</item>
+
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -22,6 +28,29 @@
     <style name="AppTheme.NoActionBar.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="spinnerStyle"  parent="@android:style/Widget.TextView.SpinnerItem">
-        <item name="android:padding">10sp</item>
+        <item name="android:padding">24dp</item>
     </style>
+
+    <style name="spinnerDropdownStyle" parent="android:TextAppearance.Widget.TextView.SpinnerItem">
+        <item name="android:textSize">24dp</item>
+    </style>
+
+    <style name="TestSpinnerStyle" parent="android:style/Widget.Spinner.DropDown">
+        <item name="android:divider">#d2d2d2</item>
+        <item name="android:dividerHeight">5dp</item>
+    </style>
+
+    <style name="buttonStyle" >
+        <item name="android:background">@drawable/button_selector</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingLeft">20dp</item>
+        <item name="android:paddingRight">20dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/colorButtonText</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_margin">1dp</item>
+    </style>
+
+
 </resources>

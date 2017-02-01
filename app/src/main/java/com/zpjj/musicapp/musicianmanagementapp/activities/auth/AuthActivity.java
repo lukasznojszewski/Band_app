@@ -14,6 +14,8 @@ import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Logger;
 import com.zpjj.musicapp.musicianmanagementapp.R;
 import com.zpjj.musicapp.musicianmanagementapp.fragments.SignInTabFragment;
 import com.zpjj.musicapp.musicianmanagementapp.fragments.SignUpTabFragment;

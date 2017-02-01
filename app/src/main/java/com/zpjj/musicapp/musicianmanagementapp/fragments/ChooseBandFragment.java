@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -39,8 +40,9 @@ public class ChooseBandFragment extends Fragment {
         bandListSpinner = (Spinner) view.findViewById(R.id.band_list);
 
         bandListAdapter = new BandListAdapter(getContext(), R.layout.spinner,bandList);
+        bandListAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         bandListSpinner.setAdapter(bandListAdapter);
-
+        bandListSpinner.setAdapter(bandListAdapter);
         chooseBandButton = (Button) view.findViewById(R.id.choose_band);
         chooseBandButton.setOnClickListener(l-> {
             onChooseBand();

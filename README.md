@@ -1,5 +1,9 @@
 # Band app
 
+## Link do pobrania APK
+
+http://www52.zippyshare.com/v/VbJhjSbH/file.html
+
 ## Działanie
 
 Aplikacja na androida dla zespołów muzycznych mająca na celu ułatwianie komunikacji wśród muzyków na scenie.

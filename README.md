@@ -1,8 +1,11 @@
 # Band app
-
 ## Link do pobrania APK
 
 http://www52.zippyshare.com/v/VbJhjSbH/file.html
+
+## Build
+
+Do zbudowania aplikacji należy założyc projekt na stronie Firebase, pobrać plik google-services.json dodać go do projektu w katalogu app
 
 ## Działanie
 
